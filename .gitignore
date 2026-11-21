@@ -1,0 +1,27 @@
+# Handoff-Dokumente (Arbeitsnotizen, gehören nicht in die Versionskontrolle)
+.handoff/
+
+# Premortem-Analysen (interne Notizen)
+.premortem/
+
+# Manueller QA-Katalog (interne Arbeitsunterlage)
+QA-tresor-datei.md
+
+# Tresor-Dateien und Backups — enthalten (verschlüsselte) Nutzerdaten,
+# gehören niemals ins Repository
+app/*.json
+*keybook*.json
+*tresor*.json
+
+# Playwright-Arbeitsdateien (Snapshots, Konsolen-Logs)
+.playwright-mcp/
+
+# Temporäre Logiktests (werden nach dem Lauf wieder gelöscht)
+app/_*.js
+
+# Auslieferungspakete
+*.zip
+
+# Claude-Code-Konfiguration (Einstellungen, Agent-Definitionen, Projektanweisungen) — lokal
+.claude/
+CLAUDE.md

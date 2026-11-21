@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- CSP als Defense-in-Depth: keine externen Verbindungen/Plugins, keine
+       Remote-Bilder (schützt u. a. vor CSS-url()-Tracking). script-/style-src
+       werden bewusst nicht auf 'self' beschränkt, damit die App auch per
+       file:// (Doppelklick) lädt. -->
+  <meta http-equiv="Content-Security-Policy"
+        content="connect-src 'none'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'" />
+  <title>KeyBook — Zugangsdaten-Manager</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ============================================================= -->
+  <!-- LOCK SCREEN (Master-Passwort: Setup oder Unlock)              -->
+  <!-- ============================================================= -->
+  <div id="lock-screen" class="lock-screen">
+    <div class="lock-card">
+      <!-- Kartenkopf: Marke links, Generator + Anleitung rechts -->
+      <div class="lock-head">
+        <div class="lock-brand">
+          <span class="lock-logo" aria-hidden="true">🔐</span>
+          <h1 class="lock-title">KeyBook</h1>
+          <span class="lock-version">v2.2</span>
+        </div>
+        <div class="lock-head-actions">
+          <button type="button" id="lock-gen-btn" class="btn btn-ghost btn-sm lock-head-btn" title="Sicheres Passwort oder Passphrase erzeugen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg> Generator</button>
+          <button type="button" id="lock-help-link" class="btn btn-ghost btn-sm lock-head-btn"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Anleitung</button>
+        </div>
+      </div>
+
+      <!-- Master-Passwort: Setup oder Unlock -->
+      <section class="lock-section">
+        <!-- Setup-Modus: Erststart, Master-Passwort festlegen -->
+        <form id="setup-form" class="lock-form" hidden>
+          <h2 class="lock-section-title">Tresor erstellen</h2>
+          <p class="lock-subtitle">Lege ein Master-Passwort fest. Damit werden alle
+            Daten verschlüsselt gespeichert. Mindestens 10 Zeichen –
+            empfohlen ist eine lange Passphrase.</p>
+          <p id="setup-restore-note" class="lock-info" hidden></p>
+          <div class="lock-grid-2">
+            <label class="field">
+              <span>Master-Passwort</span>
+              <span class="pw-field">
+                <input type="password" id="setup-password" autocomplete="new-password" minlength="10" required spellcheck="false" autocapitalize="off" />
+                <button type="button" class="pw-toggle" aria-label="Passwort anzeigen" title="Passwort anzeigen"></button>
+              </span>
+            </label>
+            <label class="field">
+              <span>Master-Passwort wiederholen</span>
+              <span class="pw-field">
+                <input type="password" id="setup-password-repeat" autocomplete="new-password" required spellcheck="false" autocapitalize="off" />
+                <button type="button" class="pw-toggle" aria-label="Passwort anzeigen" title="Passwort anzeigen"></button>
+              </span>
+            </label>
+          </div>
+          <p class="lock-warning">⚠️ Ohne dieses Passwort können die Daten nicht
+            wiederhergestellt werden. Es gibt keine Rücksetzmöglichkeit.</p>
+          <p id="setup-error" class="form-error" hidden></p>
+          <div class="lock-actions">
+            <button type="submit" class="btn btn-primary lock-submit">Tresor erstellen</button>
+          </div>
+        </form>
+
+        <!-- Unlock-Modus: Folgestart, Master-Passwort eingeben -->
+        <form id="unlock-form" class="lock-form" hidden>
+          <h2 class="lock-section-title">Tresor entsperren</h2>
+          <p class="lock-subtitle">Gib dein Master-Passwort ein, um den Tresor zu entsperren.</p>
+          <div class="lock-row">
+            <label class="field">
+              <span>Master-Passwort</span>
+              <span class="pw-field">
+                <input type="password" id="unlock-password" autocomplete="current-password" required autofocus spellcheck="false" autocapitalize="off" />
+                <button type="button" class="pw-toggle" aria-label="Passwort anzeigen" title="Passwort anzeigen"></button>
+              </span>
+            </label>
+            <button type="submit" class="btn btn-primary lock-submit">Entsperren</button>
+          </div>
+          <p id="unlock-error" class="form-error" hidden></p>
+        </form>
+      </section>
+
+      <!-- Speicherort: Tresor-Datei verknüpfen (nur Chromium; wird per JS eingeblendet) -->
+      <section id="lock-filevault" class="lock-section" hidden>
+        <h2 class="lock-section-title">Speicherort</h2>
+        <p id="lock-file-status" class="lock-file-status"></p>
+        <div class="lock-tiles">
+          <div id="lock-tile-browser" class="lock-tile is-status">
+            <span class="lock-tile-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+            <span class="lock-tile-body">
+              <span class="lock-tile-title">Im Browser <span class="lock-tile-badge">✓ aktiv</span></span>
+              <span class="lock-tile-hint">Standard: Der Tresor liegt verschlüsselt in diesem Browser.</span>
+            </span>
+          </div>
+          <button type="button" id="btn-file-open" class="lock-tile">
+            <span class="lock-tile-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
+            <span class="lock-tile-body">
+              <span class="lock-tile-title">Tresor-Datei öffnen</span>
+              <span class="lock-tile-hint">Eine vorhandene Tresor-Datei auswählen und damit verknüpfen.</span>
+            </span>
+          </button>
+          <button type="button" id="btn-file-new" class="lock-tile">
+            <span class="lock-tile-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span>
+            <span class="lock-tile-body">
+              <span class="lock-tile-title">Neue Tresor-Datei</span>
+              <span class="lock-tile-hint">Einen neuen Tresor als Datei auf deinem Computer anlegen.</span>
+            </span>
+          </button>
+          <div id="lock-tile-file" class="lock-tile is-status is-active" hidden>
+            <span class="lock-tile-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 13"/></svg></span>
+            <span class="lock-tile-body">
+              <span class="lock-tile-title">Tresor-Datei <span class="lock-tile-badge">✓ aktiv</span></span>
+              <span id="lock-file-name" class="lock-tile-hint lock-file-name"></span>
+              <span class="lock-tile-actions">
+                <button type="button" id="btn-file-grant" class="btn btn-primary btn-sm" hidden>Zugriff auf die Datei erlauben</button>
+                <button type="button" id="btn-file-unlink" class="btn-link" hidden>Verknüpfung lösen</button>
+              </span>
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Notfall: Wiederherstellung aus Backup / Zurücksetzen -->
+      <section class="lock-section">
+        <h2 class="lock-section-title">Notfall</h2>
+        <p class="lock-section-hint">Für den Ernstfall: einen Tresor aus einer Sicherung wiederherstellen.</p>
+        <div class="lock-tiles">
+          <button type="button" id="restore-file-btn" class="lock-tile">
+            <span class="lock-tile-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></span>
+            <span class="lock-tile-body">
+              <span class="lock-tile-title">Aus Backup wiederherstellen</span>
+              <span class="lock-tile-hint">Ein verschlüsseltes oder Klartext-Backup (JSON) als neuen Tresor einlesen.</span>
+            </span>
+          </button>
+          <button type="button" id="reset-vault" class="lock-tile is-danger" hidden>
+            <span class="lock-tile-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span>
+            <span class="lock-tile-body">
+              <span class="lock-tile-title">Tresor zurücksetzen</span>
+              <span class="lock-tile-hint">Löscht alle Daten in diesem Browser unwiderruflich und löst eine Datei-Verknüpfung.</span>
+            </span>
+          </button>
+        </div>
+        <input type="file" id="restore-file" accept="application/json,.json" hidden />
+      </section>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- APP (nach Entsperrung sichtbar)                               -->
+  <!-- ============================================================= -->
+  <div id="app" class="app" hidden>
+
+    <!-- Header + Filterleiste bleiben beim Scrollen zusammen fixiert -->
+    <div class="topbar">
+
+    <!-- Header / Navigation -->
+    <header class="header">
+      <div class="header-brand">
+        <span class="brand-logo">🔐</span>
+        <span class="brand-name">KeyBook</span>
+        <span class="brand-version">v2.2</span>
+        <span id="vault-date" class="vault-date"></span>
+        <button type="button" id="vault-file" class="btn btn-ghost vault-file" title="Verknüpfung zur Tresor-Datei anzeigen / lösen" hidden>Tresor lösen</button>
+        <span id="vault-unsaved" class="vault-unsaved" title="Der letzte Speicherversuch ist fehlgeschlagen." hidden>⚠ Nicht gespeichert</span>
+        <button id="btn-lock" class="btn btn-ghost" title="Tresor sperren">Tresor sperren</button>
+      </div>
+
+      <div class="header-search">
+        <div class="search-box">
+          <button type="button" id="search-submit" class="search-btn search-btn-go" title="Suchen" aria-label="Suchen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+          <input type="text" id="search-input" placeholder="Dienst suchen…" autocomplete="off" />
+          <button type="button" id="search-clear" class="search-btn search-btn-clear" title="Suche leeren" aria-label="Suche leeren" hidden><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+      </div>
+
+      <nav class="header-actions">
+        <button id="btn-new-entry" class="btn btn-primary">+ Neuer Eintrag</button>
+        <button id="btn-toggle-filter" class="btn btn-ghost">Filter</button>
+        <button id="btn-manage-groups" class="btn btn-ghost">Gruppen</button>
+        <button id="btn-export-json" class="btn btn-ghost">Export</button>
+        <button id="btn-import-json" class="btn btn-ghost">Import</button>
+        <button id="btn-export-pdf-all" class="btn btn-ghost">PDF <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
+        <button id="btn-pw-hide" class="btn btn-ghost btn-icon" title="Passwörter verbergen" aria-label="Passwörter verbergen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        <button id="btn-collapse-all" class="btn btn-ghost btn-icon" title="Alle Gruppen zuklappen" aria-label="Alle Gruppen zuklappen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <button id="btn-header-generator" class="btn btn-ghost btn-icon" title="Passwortgenerator" aria-label="Passwortgenerator"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></button>
+        <button id="btn-help" class="btn btn-ghost btn-icon" title="Kurzanleitung öffnen" aria-label="Kurzanleitung öffnen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
+        <button id="btn-theme" class="btn btn-ghost btn-icon" title="Hell/Dunkel umschalten" aria-label="Darkmode umschalten"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+        <span id="idle-timer" class="idle-timer" role="timer" title="Automatische Sperre bei Inaktivität — jede Maus- oder Tastaturaktivität setzt den Countdown zurück" aria-label="Zeit bis zur automatischen Sperre"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span id="idle-timer-value">2:00</span></span>
+        <input type="file" id="import-file" accept="application/json,.json" hidden />
+      </nav>
+    </header>
+
+    <!-- Filterleiste (ausklappbar) -->
+    <section id="filter-bar" class="filter-bar" hidden>
+      <label class="field field-inline">
+        <span>Gruppe</span>
+        <select id="filter-group">
+          <option value="">Alle Gruppen</option>
+        </select>
+      </label>
+      <label class="check-inline">
+        <input type="checkbox" id="filter-subscription" />
+        <span>Abos</span>
+      </label>
+      <label class="check-inline">
+        <input type="checkbox" id="filter-authenticator" />
+        <span>Authenticator</span>
+      </label>
+      <label class="check-inline">
+        <input type="checkbox" id="filter-biometrics" />
+        <span>Biometrie</span>
+      </label>
+      <label class="check-inline">
+        <input type="checkbox" id="filter-pin" />
+        <span>PIN</span>
+      </label>
+      <label class="check-inline">
+        <input type="checkbox" id="filter-twofa" />
+        <span>2FA</span>
+      </label>
+      <label class="check-inline">
+        <input type="checkbox" id="filter-passkey" />
+        <span>Passkey</span>
+      </label>
+      <label class="check-inline">
+        <input type="checkbox" id="filter-googlelinked" />
+        <span>Google-Verknüpfung</span>
+      </label>
+      <button id="btn-clear-filters" class="btn btn-ghost btn-sm"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Filter zurücksetzen</button>
+    </section>
+
+    </div><!-- /.topbar -->
+
+    <!-- Hauptbereich: links gruppierte Liste, rechts Info-Card -->
+    <main class="content">
+      <!-- Linke Spalte: nach Gruppen gegliederte, auf-/zuklappbare Liste -->
+      <section class="list-pane">
+        <div class="table-wrap">
+          <table class="entry-table">
+            <thead>
+              <tr>
+                <th>Dienst</th>
+                <th>Username</th>
+                <th>E-Mail</th>
+                <th>Passwort</th>
+              </tr>
+            </thead>
+            <tbody id="entry-list"><!-- gruppiert gerendert via JS --></tbody>
+          </table>
+        </div>
+        <div id="empty-state" class="empty-state" hidden>
+          <p class="empty-title">Keine Einträge gefunden</p>
+          <p class="empty-hint">Lege einen neuen Eintrag an oder passe die Filter an.</p>
+        </div>
+      </section>
+
+      <!-- Rechte Spalte: Info-Card des ausgewählten Eintrags -->
+      <aside class="detail-pane">
+        <div id="info-card" class="info-card">
+          <div class="info-empty">
+            <span class="info-empty-icon">🗂️</span>
+            <p>Wähle links einen Eintrag aus,<br />um alle Details zu sehen.</p>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: Eintrag anlegen / bearbeiten                           -->
+  <!-- ============================================================= -->
+  <div id="entry-modal" class="modal-overlay" hidden>
+    <div class="modal modal-lg" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h2 id="entry-modal-title">Neuer Eintrag</h2>
+        <button class="modal-close" data-close="entry-modal" aria-label="Schließen">×</button>
+      </div>
+
+      <form id="entry-form" class="modal-body">
+        <input type="hidden" id="entry-id" />
+
+        <!-- Basisdaten -->
+        <fieldset class="form-section">
+          <legend>Basisdaten</legend>
+          <div class="form-row form-row-mixed">
+            <label class="field">
+              <span>Gruppe / Kategorie</span>
+              <select id="entry-group"><option value="">— keine Gruppe —</option></select>
+            </label>
+            <label class="check-inline check-inline-top">
+              <input type="checkbox" id="entry-googleLinked" />
+              <span>mit Google verknüpft</span>
+            </label>
+          </div>
+
+          <div class="form-row">
+            <label class="field">
+              <span>Dienst / Plattform *</span>
+              <input type="text" id="entry-serviceName" required />
+            </label>
+            <label class="field">
+              <span>Link (URL)</span>
+              <input type="url" id="entry-serviceUrl" autocomplete="off" placeholder="https://…" />
+            </label>
+          </div>
+
+          <div class="form-row">
+            <label class="field">
+              <span>Username</span>
+              <input type="text" id="entry-username" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span>Passwort</span>
+              <div class="input-with-btn">
+                <input type="text" id="entry-password" autocomplete="off" />
+                <button type="button" id="btn-open-generator" class="btn btn-ghost btn-sm">Generator</button>
+              </div>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>E-Mail-Adresse</span>
+            <input type="email" id="entry-email" autocomplete="off" />
+          </label>
+
+          <label class="field">
+            <span>Telefonnummer</span>
+            <input type="tel" id="entry-phone" autocomplete="off" />
+          </label>
+
+          <label class="field">
+            <span>Notizen</span>
+            <textarea id="entry-notes" rows="2"></textarea>
+          </label>
+        </fieldset>
+
+        <!-- Sicherheit -->
+        <fieldset class="form-section">
+          <legend>Sicherheit</legend>
+          <div class="form-row">
+            <label class="check-inline">
+              <input type="checkbox" id="entry-twoFA" />
+              <span>2FA aktiviert</span>
+            </label>
+            <label class="check-inline">
+              <input type="checkbox" id="entry-passkey" />
+              <span>Passkey aktiviert</span>
+            </label>
+            <label class="check-inline">
+              <input type="checkbox" id="entry-biometrics" />
+              <span>Biometrie aktiviert</span>
+            </label>
+          </div>
+          <div class="form-row">
+            <label class="field">
+              <span>Passkey-Details</span>
+              <input type="text" id="entry-passkeyInfo" autocomplete="off" placeholder="z. B. iPhone, YubiKey 5C" />
+            </label>
+            <label class="field">
+              <span>PIN</span>
+              <input type="text" id="entry-pin" autocomplete="off" />
+            </label>
+          </div>
+          <div class="field">
+            <span>Authenticator-App(s)</span>
+            <!-- Checkboxen werden dynamisch aus Entries.AUTHENTICATORS erzeugt -->
+            <div id="entry-authenticators" class="auth-options"></div>
+          </div>
+          <div class="form-row">
+            <label class="field">
+              <span>Wiederherstellungs-Telefonnummer</span>
+              <input type="tel" id="entry-recoveryPhone" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span>Wiederherstellungs-E-Mail-Adresse</span>
+              <input type="email" id="entry-recoveryEmail" autocomplete="off" />
+            </label>
+          </div>
+          <label class="field">
+            <span>Sicherheitsfragen</span>
+            <textarea id="entry-securityQuestions" rows="2"></textarea>
+          </label>
+        </fieldset>
+
+        <!-- Vertrag / Abo -->
+        <fieldset class="form-section">
+          <legend>Vertrag / Abo</legend>
+          <div class="form-row form-row-mixed">
+            <label class="check-inline">
+              <input type="checkbox" id="entry-subscription" />
+              <span>Abo aktiv</span>
+            </label>
+            <label class="field">
+              <input type="text" id="entry-contractInfo" autocomplete="off" placeholder="Infos, Tarif, Modell etc..." />
+            </label>
+          </div>
+          <div class="form-row">
+            <label class="field">
+              <span>Zahlungsmethode</span>
+              <input type="text" id="entry-paymentMethod" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span>Kosten</span>
+              <input type="text" id="entry-cost" autocomplete="off" placeholder="z. B. 9,99 €" />
+            </label>
+            <label class="field">
+              <span>Zahlungsweise</span>
+              <select id="entry-paymentInterval">
+                <option value="">—</option>
+                <option value="einmalig">einmalig</option>
+                <option value="täglich">täglich</option>
+                <option value="wöchentlich">wöchentlich</option>
+                <option value="monatlich">monatlich</option>
+                <option value="vierteljährlich">vierteljährlich</option>
+                <option value="jährlich">jährlich</option>
+              </select>
+            </label>
+          </div>
+          <div class="form-row">
+            <label class="field">
+              <span>Vertragsstart</span>
+              <input type="date" id="entry-contractStart" />
+            </label>
+            <label class="field">
+              <span>Vertragsende</span>
+              <input type="date" id="entry-contractEnd" />
+            </label>
+            <label class="field">
+              <span>Kündigungsfrist</span>
+              <input type="text" id="entry-cancellationPeriod" placeholder="z. B. 3 Monate" />
+            </label>
+          </div>
+        </fieldset>
+
+        <p id="entry-error" class="form-error" hidden></p>
+      </form>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" data-close="entry-modal">Abbrechen</button>
+        <button type="submit" form="entry-form" class="btn btn-primary">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: Passwortgenerator                                      -->
+  <!-- ============================================================= -->
+  <div id="generator-modal" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h2>Passwortgenerator</h2>
+        <button class="modal-close" data-close="generator-modal" aria-label="Schließen">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="gen-tabs">
+          <button type="button" id="gen-tab-pw" class="gen-tab active">Passwort</button>
+          <button type="button" id="gen-tab-pp" class="gen-tab">Passphrase</button>
+        </div>
+        <div id="gen-panel-pw">
+          <label class="field">
+            <span>Länge: <strong id="gen-length-value">16</strong></span>
+            <input type="range" id="gen-length" min="6" max="64" value="16" />
+          </label>
+          <div class="gen-options">
+            <label class="check-inline"><input type="checkbox" id="gen-upper" checked /><span>Großbuchstaben (A–Z)</span></label>
+            <label class="check-inline"><input type="checkbox" id="gen-lower" checked /><span>Kleinbuchstaben (a–z)</span></label>
+            <label class="check-inline"><input type="checkbox" id="gen-digits" checked /><span>Zahlen (0–9)</span></label>
+            <label class="check-inline"><input type="checkbox" id="gen-symbols" checked /><span>Sonderzeichen (!@#…)</span></label>
+          </div>
+        </div>
+        <div id="gen-panel-pp" hidden>
+          <label class="field">
+            <span>Wörter: <strong id="gen-words-value">5</strong></span>
+            <input type="range" id="gen-words" min="3" max="8" value="5" />
+          </label>
+          <div class="gen-options">
+            <label class="check-inline"><input type="checkbox" id="gen-pp-upper" checked /><span>Ersten Buchstaben groß</span></label>
+            <label class="check-inline"><input type="checkbox" id="gen-pp-number" /><span>Zahl anhängen</span></label>
+          </div>
+          <label class="field">
+            <span>Trennzeichen</span>
+            <select id="gen-pp-sep">
+              <option value="-">Bindestrich  (−)</option>
+              <option value=".">Punkt  (.)</option>
+              <option value="_">Unterstrich  (_)</option>
+              <option value=" ">Leerzeichen  ( )</option>
+              <option value="">Kein Trennzeichen</option>
+            </select>
+          </label>
+        </div>
+        <div class="gen-output">
+          <input type="text" id="gen-result" readonly placeholder="Generiertes Passwort…" />
+          <button type="button" id="btn-gen-copy" class="btn-copy">Kopieren</button>
+        </div>
+        <p id="gen-error" class="form-error" hidden></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btn-generate" class="btn btn-ghost">Generieren</button>
+        <button type="button" id="btn-gen-apply" class="btn btn-primary">In Eintrag übernehmen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: Gruppenverwaltung                                      -->
+  <!-- ============================================================= -->
+  <div id="groups-modal" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h2>Gruppen verwalten</h2>
+        <button class="modal-close" data-close="groups-modal" aria-label="Schließen">×</button>
+      </div>
+      <div class="modal-body">
+        <!-- Formular: Gruppe anlegen / bearbeiten -->
+        <form id="group-form" class="group-form">
+          <input type="hidden" id="group-id" />
+          <label class="field field-grow">
+            <span>Name</span>
+            <input type="text" id="group-name" required />
+          </label>
+          <label class="field">
+            <span>Farbe</span>
+            <input type="color" id="group-color" value="#97a39d" />
+          </label>
+          <div class="group-form-actions">
+            <button type="submit" class="btn btn-primary btn-sm" id="group-save-btn">Hinzufügen</button>
+            <button type="button" id="group-cancel-btn" class="btn btn-ghost btn-sm" hidden>Abbrechen</button>
+          </div>
+          <div id="color-presets" class="color-presets"></div>
+        </form>
+        <p id="group-error" class="form-error" hidden></p>
+
+        <!-- Liste bestehender Gruppen -->
+        <ul id="group-list" class="group-list"><!-- gerendert via JS --></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: Export-Auswahl (verschlüsselt / Klartext)              -->
+  <!-- ============================================================= -->
+  <div id="export-modal" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h2>Daten exportieren</h2>
+        <button class="modal-close" data-close="export-modal" aria-label="Schließen">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Wie möchtest du exportieren?</p>
+        <div class="export-choice">
+          <button type="button" id="btn-export-encrypted" class="export-option">
+            <span class="export-option-title">🔒 Verschlüsselt <span class="export-badge">empfohlen</span></span>
+            <span class="export-option-desc">Mit deinem Master-Passwort geschützt. Nur mit diesem
+              Passwort wieder importierbar.</span>
+          </button>
+          <button type="button" id="btn-export-plaintext" class="export-option">
+            <span class="export-option-title">📄 Klartext (JSON)</span>
+            <span class="export-option-desc">Unverschlüsselt – enthält alle Passwörter lesbar.
+              Nur für Notfälle/Backup; sicher aufbewahren und danach löschen.</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" data-close="export-modal">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: Verknüpfte Tresor-Datei – Info + Verknüpfung lösen      -->
+  <!-- ============================================================= -->
+  <div id="unlink-modal" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h2>Verknüpfter Tresor</h2>
+        <button class="modal-close" data-close="unlink-modal" aria-label="Schließen">×</button>
+      </div>
+      <div class="modal-body">
+        <dl class="unlink-info">
+          <dt>Datei</dt><dd id="unlink-file"></dd>
+          <dt>Letzter Stand</dt><dd id="unlink-saved"></dd>
+          <dt>Inhalt</dt><dd id="unlink-content"></dd>
+        </dl>
+        <p class="unlink-explain">
+          Dein Tresor wird aktuell <strong>in dieser Datei</strong> gespeichert, nicht im Browser.
+          Wenn du die Verknüpfung löst, wird der Tresor ab sofort <strong>nur noch im Browser</strong>
+          gespeichert. Die Datei selbst bleibt unverändert erhalten und lässt sich später wieder
+          verknüpfen oder importieren. Änderungen danach landen nicht mehr in der Datei.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" data-close="unlink-modal">Abbrechen</button>
+        <button type="button" id="btn-unlink-confirm" class="btn btn-danger">Verknüpfung lösen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: Drucken – Gruppenauswahl                               -->
+  <!-- ============================================================= -->
+  <div id="print-modal" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h2>Drucken – Gruppen auswählen</h2>
+        <button class="modal-close" data-close="print-modal" aria-label="Schließen">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="print-select-actions">
+          <button type="button" id="btn-print-all-groups" class="btn btn-ghost btn-sm">Alle</button>
+          <button type="button" id="btn-print-no-groups" class="btn btn-ghost btn-sm">Keine</button>
+        </div>
+        <ul id="print-group-list" class="print-group-list"><!-- gerendert via JS --></ul>
+        <p id="print-summary" class="print-summary"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" data-close="print-modal">Abbrechen</button>
+        <button type="button" id="btn-print-confirm" class="btn btn-primary">Drucken</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: Passwort für Wiederherstellung (verschlüsseltes Backup) -->
+  <!-- ============================================================= -->
+  <div id="restore-pw-modal" class="modal-overlay" hidden>
+    <div class="modal modal-sm" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h2>Backup wiederherstellen</h2>
+        <button class="modal-close" data-close="restore-pw-modal" aria-label="Schließen">×</button>
+      </div>
+      <form id="restore-pw-form" class="modal-body">
+        <p>Diese Backup-Datei ist verschlüsselt. Gib das damals verwendete
+          Master-Passwort ein. Es wird anschließend dein Master-Passwort für diesen Tresor.</p>
+        <label class="field">
+          <span>Master-Passwort des Backups</span>
+          <span class="pw-field">
+            <input type="password" id="restore-pw-input" autocomplete="off" required spellcheck="false" autocapitalize="off" />
+            <button type="button" class="pw-toggle" aria-label="Passwort anzeigen" title="Passwort anzeigen"></button>
+          </span>
+        </label>
+        <p id="restore-pw-error" class="form-error" hidden></p>
+      </form>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" data-close="restore-pw-modal">Abbrechen</button>
+        <button type="submit" form="restore-pw-form" class="btn btn-primary">Wiederherstellen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: Passwort für verschlüsselten Import                    -->
+  <!-- ============================================================= -->
+  <div id="import-pw-modal" class="modal-overlay" hidden>
+    <div class="modal modal-sm" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h2>Verschlüsselte Datei</h2>
+        <button class="modal-close" data-close="import-pw-modal" aria-label="Schließen">×</button>
+      </div>
+      <form id="import-pw-form" class="modal-body">
+        <p>Diese Datei ist verschlüsselt. Gib das Master-Passwort ein, mit dem sie
+          exportiert wurde.</p>
+        <label class="field">
+          <span>Master-Passwort der Datei</span>
+          <span class="pw-field">
+            <input type="password" id="import-pw-input" autocomplete="off" required spellcheck="false" autocapitalize="off" />
+            <button type="button" class="pw-toggle" aria-label="Passwort anzeigen" title="Passwort anzeigen"></button>
+          </span>
+        </label>
+        <p id="import-pw-error" class="form-error" hidden></p>
+      </form>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" data-close="import-pw-modal">Abbrechen</button>
+        <button type="submit" form="import-pw-form" class="btn btn-primary">Entschlüsseln</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: Import-Optionen                                        -->
+  <!-- ============================================================= -->
+  <div id="import-modal" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h2>Daten importieren</h2>
+        <button class="modal-close" data-close="import-modal" aria-label="Schließen">×</button>
+      </div>
+      <div class="modal-body">
+        <p id="import-summary" class="import-summary"></p>
+        <p>Wie sollen die importierten Daten verarbeitet werden?</p>
+        <p id="import-error" class="form-error" hidden></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" data-close="import-modal">Abbrechen</button>
+        <button type="button" id="btn-import-merge" class="btn btn-ghost">Ergänzen</button>
+        <button type="button" id="btn-import-replace" class="btn btn-primary">Ersetzen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: Bestätigung (Löschen etc.)                             -->
+  <!-- ============================================================= -->
+  <div id="confirm-modal" class="modal-overlay" hidden>
+    <div class="modal modal-sm" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h2 id="confirm-title">Bestätigen</h2>
+        <button class="modal-close" data-close="confirm-modal" aria-label="Schließen">×</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-message"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" data-close="confirm-modal">Abbrechen</button>
+        <button type="button" id="confirm-ok" class="btn btn-danger">Löschen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast-Container für kurzes Feedback -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Druckcontainer für PDF-Ausgabe (nur beim Drucken sichtbar) -->
+  <div id="print-area" class="print-area"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

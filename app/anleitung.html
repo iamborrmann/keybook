@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KeyBook — Benutzeranleitung</title>
+  <style>
+    /* Sandtöne wie in der App; Dunkelmodus über prefers-color-scheme */
+    :root {
+      --bg: #f3ecdd;
+      --surface: #fffdf8;
+      --surface-2: #faf4e8;
+      --border: #e5dac4;
+      --text: #382f23;
+      --muted: #8a7d68;
+      --primary: #a85f2c;
+      --primary-soft: #f2e3d0;
+      --success: #6f8f4e;
+      --shadow: 0 4px 12px rgba(76, 56, 28, 0.10);
+      --radius: 8px;
+    }
+    /* Dunkle Palette (gemeinsam für manuelle Wahl und System-Fallback) */
+    :root[data-theme="dark"] {
+      --bg: #1a1c1b;
+      --surface: #232726;
+      --surface-2: #2b302e;
+      --border: #3a403d;
+      --text: #e5e8e6;
+      --muted: #97a39d;
+      --primary: #6e9e80;
+      --primary-soft: #2b3a32;
+      --success: #74b58c;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+    }
+    /* Fallback ohne JS: der Systemeinstellung folgen, solange nichts gewählt wurde */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --bg: #1a1c1b;
+        --surface: #232726;
+        --surface-2: #2b302e;
+        --border: #3a403d;
+        --text: #e5e8e6;
+        --muted: #97a39d;
+        --primary: #6e9e80;
+        --primary-soft: #2b3a32;
+        --success: #74b58c;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    body {
+      margin: 0;
+      padding: 32px 16px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary-soft), var(--bg));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 28px 24px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow);
+    }
+    header h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    header h1 .logo { width: 30px; height: 30px; flex: 0 0 auto; }
+    header { position: relative; }
+    /* Theme-Umschalter oben rechts im Kopf */
+    .help-theme-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+    .help-theme-btn:hover { border-color: var(--primary); color: var(--primary); }
+    header .doc-version {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    header .lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    nav {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 28px;
+    }
+    nav strong { display: block; margin-bottom: 8px; font-size: 14px; }
+    nav ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+    }
+    a { color: var(--primary); text-decoration: underline; text-underline-offset: 2px; }
+    a:hover { color: var(--primary); opacity: 0.8; }
+    nav a {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    nav a:hover { text-decoration: underline; opacity: 1; }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 26px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    section h2 {
+      margin: 0 0 12px;
+      font-size: 19px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    section h2 .ico {
+      font-size: 20px;
+      line-height: 1;
+    }
+    section h3 {
+      margin: 18px 0 6px;
+      font-size: 15px;
+      color: var(--primary);
+    }
+    section h4 { margin: 14px 0 4px; font-size: 14px; }
+    p { margin: 8px 0; }
+    ul.steps, ul.bullets { margin: 8px 0; padding-left: 22px; }
+    ul.steps li, ul.bullets li { margin: 5px 0; }
+
+    code, kbd {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 13px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    /* Inline-Icon im Fließtext — identisch zum Outline-Stil der App */
+    .ic {
+      width: 1.05em;
+      height: 1.05em;
+      vertical-align: -0.18em;
+      stroke-width: 2;
+    }
+    /* Icon „im Button-Rahmen" darstellen, wie es in der App aussieht */
+    .ic-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.9em;
+      height: 1.9em;
+      vertical-align: -0.55em;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: var(--surface-2);
+      color: var(--text);
+    }
+    .ic-btn .ic { vertical-align: 0; }
+
+    .note {
+      border-left: 3px solid var(--primary);
+      background: var(--primary-soft);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 14px 0;
+      font-size: 14px;
+    }
+    .note.warn {
+      border-left-color: var(--success);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 11px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: var(--surface-2);
+      font-weight: 700;
+      color: var(--text);
+    }
+    td { background: var(--surface); }
+
+    .card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+      margin: 14px 0;
+      font-size: 14px;
+    }
+    .card strong { color: var(--primary); }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 28px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 14px;
+      margin: 14px 0;
+    }
+    .feature-item {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px;
+      font-size: 13px;
+    }
+    .feature-item strong { color: var(--primary); display: block; margin-bottom: 4px; }
+
+    /* Demo-Badges (wie in der Liste hinter dem Dienstnamen) */
+    .b {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .b-2fa    { background: #e8f5ee; color: #3a7a5a; }
+    .b-auth   { background: #f0ecfa; color: #7b5db0; }
+    .b-google { background: #e8f0fb; color: #4a6ea8; }
+    .b-abo    { background: #fdf5e0; color: #8a6530; }
+    .b-pay    { background: #dcdcdc; color: #000; text-align: center; }
+    @media (prefers-color-scheme: dark) { .b-pay { background: #8a8f8c; } }
+
+    /* Tabellen-Striping für bessere Lesbarkeit */
+    tbody tr:nth-child(odd) { background: var(--surface-2); }
+
+    @media print {
+      body { background: #fff; color: #000; padding: 0; }
+      header, section, nav { box-shadow: none; border-color: #ccc; }
+      nav { display: none; }
+      section { break-inside: avoid; }
+      .help-theme-btn { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      .wrap { max-width: 100%; }
+      body { padding: 16px; }
+      header { padding: 20px; }
+      section { padding: 16px; }
+      header h1 { font-size: 22px; }
+      section h2 { font-size: 16px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      /* Button nicht über dem Titel schweben lassen, sondern darüber setzen */
+      .help-theme-btn { position: static; margin: 0 0 14px; }
+    }
+  </style>
+  <!-- Einziges Skript dieser Seite: nur der Hell-/Dunkel-Umschalter. Inline,
+       offline-/file://-tauglich, ohne externe Abhängigkeiten. -->
+  <script>
+    (function () {
+      var KEY = "keybook.help.theme";
+      var root = document.documentElement;
+      function prefersDark() {
+        return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      }
+      function currentMode() {
+        var s;
+        try { s = localStorage.getItem(KEY); } catch (e) { s = null; }
+        return s === "dark" || s === "light" ? s : (prefersDark() ? "dark" : "light");
+      }
+      function syncBtn(mode) {
+        var btn = document.getElementById("help-theme-btn");
+        if (btn) btn.textContent = mode === "dark" ? "☀️ Heller Modus" : "🌙 Dunkler Modus";
+      }
+      function apply(mode) {
+        root.setAttribute("data-theme", mode);
+        syncBtn(mode);
+      }
+      // Sofort anwenden (vor dem Rendern), um Flackern zu vermeiden
+      apply(currentMode());
+      document.addEventListener("DOMContentLoaded", function () {
+        syncBtn(root.getAttribute("data-theme"));
+        var btn = document.getElementById("help-theme-btn");
+        if (btn) {
+          btn.addEventListener("click", function () {
+            var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+            try { localStorage.setItem(KEY, next); } catch (e) {}
+            apply(next);
+          });
+        }
+      });
+    })();
+  </script>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <button type="button" id="help-theme-btn" class="help-theme-btn" aria-label="Hell-/Dunkelmodus umschalten">🌙 Dunkler Modus</button>
+      <h1>
+        <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        KeyBook — Benutzeranleitung
+      </h1>
+      <p class="doc-version">Version 2.2</p>
+      <p class="lead">
+        Dein persönlicher Passwort-Tresor. Läuft komplett offline im Browser —
+        deine Daten bleiben verschlüsselt auf deinem Gerät und verlassen es nie.
+      </p>
+    </header>
+
+    <nav>
+      <strong>Inhalt</strong>
+      <ul>
+        <li><a href="#was-ist">Was ist KeyBook?</a></li>
+        <li><a href="#start">Erster Start</a></li>
+        <li><a href="#sperrbildschirm">Sperrbildschirm</a></li>
+        <li><a href="#hauptansicht">Hauptansicht</a></li>
+        <li><a href="#icons">Icon-Übersicht</a></li>
+        <li><a href="#eintraege">Einträge</a></li>
+        <li><a href="#gruppen">Gruppen</a></li>
+        <li><a href="#suchen">Suchen &amp; Filtern</a></li>
+        <li><a href="#generator">Passwort-Generator</a></li>
+        <li><a href="#kopieren">Kopieren</a></li>
+        <li><a href="#links">Links öffnen</a></li>
+        <li><a href="#passwort-verbergen">Passwörter verbergen</a></li>
+        <li><a href="#drucken">Drucken / PDF</a></li>
+        <li><a href="#backup">Backup &amp; Wiederherstellung</a></li>
+        <li><a href="#tresor-datei">Tresor-Datei verknüpfen</a></li>
+        <li><a href="#sicherheit">Sicherheit &amp; Datenschutz</a></li>
+      </ul>
+    </nav>
+
+    <!-- ============================================================= -->
+    <!-- 1. Was ist KeyBook -->
+    <!-- ============================================================= -->
+    <section id="was-ist">
+      <h2><span class="ico">📱</span> Was ist KeyBook?</h2>
+      <p>
+        KeyBook ist ein <strong>clientseitiger Passwort-Manager</strong> — ein digitaler
+        Tresor für alle deine Zugangsdaten. Die App läuft komplett offline, direkt in deinem
+        Browser, ohne einen Server oder Cloud-Dienst zu benötigen.
+      </p>
+      <h3>Kernmerkmale</h3>
+      <ul class="bullets">
+        <li><strong>100&nbsp;% offline:</strong> Läuft per Doppelklick auf <code>index.html</code> im Browser.</li>
+        <li><strong>Keine Cloud:</strong> Deine Daten verlassen niemals deinen Computer.</li>
+        <li><strong>Verschlüsselt:</strong> Alle Informationen liegen AES-GCM-256-verschlüsselt lokal im Browser.</li>
+        <li><strong>Kein Backend, keine Abhängigkeiten:</strong> Reines HTML5 + Vanilla&nbsp;JavaScript + CSS3 — läuft überall.</li>
+        <li><strong>Kostenlos und offen:</strong> Keine Werbung, keine Abos, keine Anmeldungen.</li>
+      </ul>
+
+      <h3>Was kannst du speichern?</h3>
+      <p>KeyBook unterstützt folgende Daten pro Eintrag:</p>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <strong>Login-Daten</strong>
+          Dienstname, Username, E-Mail, Passwort
+        </div>
+        <div class="feature-item">
+          <strong>Sicherheit</strong>
+          2FA, Passkey, Biometrie, PIN, Authenticator-Apps, Wiederherstellungs-Daten, Sicherheitsfragen
+        </div>
+        <div class="feature-item">
+          <strong>Vertrag &amp; Abo</strong>
+          Abo aktiv, Info, Zahlungsmethode, Kosten, Zahlungsweise, Start-/Enddaten, Kündigungsfrist
+        </div>
+        <div class="feature-item">
+          <strong>Weitere Infos</strong>
+          URL zum Dienst, Notizen, Gruppenzuordnung
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 2. Erster Start — Tresor anlegen -->
+    <!-- ============================================================= -->
+    <section id="start">
+      <h2><span class="ico">🚀</span> Erster Start — Tresor anlegen</h2>
+      <p>
+        Beim ersten Start legst du deinen persönlichen Passwort-Tresor mit einem
+        <strong>Master-Passwort</strong> an. Dieses eine Passwort schützt alle deine
+        Zugangsdaten.
+      </p>
+
+      <h3>Tresor erstellen — Schritt für Schritt</h3>
+      <ul class="steps">
+        <li>
+          <strong>App starten:</strong> Öffne <code>index.html</code> per Doppelklick im Dateimanager
+          oder per Rechtsklick → „Öffnen mit → Browser".
+        </li>
+        <li>
+          <strong>Master-Passwort wählen:</strong> Du siehst ein Setup-Formular. Wähle ein
+          <strong>starkes, einprägsames Passwort</strong> — mindestens 10 Zeichen.
+          <em>Tipp: Eine lange Passphrase (z.&nbsp;B. „Mein%Lieblingsfilm2024€")</em> ist sicherer
+          als kurze Zufallszeichenketten.
+        </li>
+        <li>
+          <strong>Wiederholung bestätigen:</strong> Gib das Passwort ein zweites Mal ein,
+          um Tippfehler auszuschließen.
+        </li>
+        <li>
+          <strong>Tresor erstellen:</strong> Klick auf „Tresor erstellen". Der Tresor wird
+          mit <strong>AES-GCM-256</strong> + <strong>PBKDF2 (600.000&nbsp;Iterationen)</strong>
+          verschlüsselt und im Browser-Speicher (<code>localStorage</code>) abgelegt.
+        </li>
+        <li>
+          <strong>Willkommen!</strong> Der Tresor öffnet sich und du siehst die Hauptansicht.
+        </li>
+      </ul>
+
+      <div class="note warn">
+        <strong>⚠️ Wichtig:</strong> Das Master-Passwort kann <u>nicht</u> wiederhergestellt werden.
+        <br /><br />
+        Vergisst du es, sind alle deine Daten unwiederbringlich verschlüsselt und verloren.
+        Es gibt keine Rücksetzmöglichkeit, keinen Admin-Modus und keine Wiederherstellung — also:
+        <br /><br />
+        <strong>Bewahre dein Master-Passwort an einem sicheren Ort auf!</strong>
+        (z.&nbsp;B. in einem physischen Tresor oder bei einer vertrauten Person.)
+      </div>
+
+      <h3>Empfehlungen für ein starkes Master-Passwort</h3>
+      <ul class="bullets">
+        <li><strong>Mindestens 10 Zeichen,</strong> besser 15–20.</li>
+        <li><strong>Mix aus Groß-/Kleinbuchstaben, Zahlen und Sonderzeichen:</strong>
+          z.&nbsp;B. <code>MeineTiger2024#Passwort</code></li>
+        <li><strong>Oder eine Passphrase:</strong> Eine zufällige Folge von Wörtern ist oft sicherer
+          und leichter zu merken, z.&nbsp;B. <code>Giraffe Klavier Sommer 2024</code></li>
+        <li><strong>Nicht leicht zu erraten:</strong> Vermeide Geburtstage, Namen, Haustiere oder
+          andere persönliche Daten.</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 3. Sperrbildschirm -->
+    <!-- ============================================================= -->
+    <section id="sperrbildschirm">
+      <h2><span class="ico">🔒</span> Sperrbildschirm</h2>
+      <p>
+        Der Sperrbildschirm erscheint beim Start oder nachdem der Tresor gesperrt wurde.
+        Er schützt deinen Tresor, wenn du die App verlässt oder der Computer in den Standby geht.
+      </p>
+      <p>Er ist in drei Bereiche gegliedert. Die Aktionen sind Kacheln mit kurzem Hilfstext:</p>
+      <ul class="bullets">
+        <li><strong>Entsperren</strong> bzw. <strong>Tresor erstellen</strong> beim ersten Start:
+          Eingabe des Master-Passworts.</li>
+        <li><strong>Speicherort</strong> (nur Chrome/Edge): zeigt, wo dein Tresor liegt
+          (<em>Im Browser</em> oder <em>Tresor-Datei</em>, markiert mit „✓ aktiv"), und bietet die
+          Kacheln „Tresor-Datei öffnen" und „Neue Tresor-Datei" an
+          (siehe <a href="#tresor-datei">Tresor-Datei</a>).</li>
+        <li><strong>Notfall</strong>: „Aus Backup wiederherstellen" und — sobald ein Tresor
+          existiert — „Tresor zurücksetzen". In Firefox/Safari entfällt der Speicherort-Bereich.</li>
+      </ul>
+      <p>Oben rechts öffnet <strong>„Anleitung"</strong> diese Hilfe, <strong>„Generator"</strong>
+        den <a href="#generator">Passwort-Generator</a>.</p>
+
+      <h3>Tresor entsperren</h3>
+      <p>
+        Gib dein Master-Passwort ein und klick auf „Entsperren".
+        <br />Bei einem Tippfehler zeigt die App eine Fehlermeldung — das ist beabsichtigt.
+      </p>
+      <p>
+        Mit dem <strong>Auge</strong> rechts im Passwortfeld schaltest du die Eingabe auf
+        Klartext um (und zurück) — praktisch bei langen Passphrasen. Beim Sperren, Entsperren und
+        Schließen eines Dialogs werden die Felder automatisch wieder verborgen.
+      </p>
+
+      <h3>Master-Passwort beim ersten Start erzeugen</h3>
+      <p>
+        Beim Anlegen eines Tresors bietet der Generator zusätzlich
+        <strong>„Als Master-Passwort übernehmen"</strong>. Vorgeschlagen wird eine
+        <strong>Passphrase</strong> (mehrere Wörter, gut merkbar); auf „Passwort" kannst du
+        umschalten. Nach dem Übernehmen stehen beide Felder im Klartext da —
+        <strong>notiere das Passwort sicher</strong>, bevor du „Tresor erstellen" klickst.
+      </p>
+
+      <div class="card">
+        <strong>💡 Tipp:</strong> Der Tresor wird nach <strong>2&nbsp;Minuten</strong> Inaktivität
+        automatisch gesperrt. Die verbleibende Zeit zeigt der Countdown (🕒) rechts neben dem
+        Hell/Dunkel-Knopf; jede Maus- oder Tastaturaktivität setzt ihn zurück, in den letzten
+        30&nbsp;Sekunden wird er hervorgehoben. Du kannst den Tresor aber auch jederzeit manuell
+        sperren (Button „Tresor sperren").
+      </div>
+
+      <h3>Was beim Sperren passiert</h3>
+      <ul class="bullets">
+        <li>Der Sperrbildschirm erscheint.</li>
+        <li>Der Verschlüsselungsschlüssel wird aus dem Speicher gelöscht.</li>
+        <li>Die Zwischenablage wird sofort geleert (auch kopierte Passwörter).</li>
+      </ul>
+
+      <h3>Aus Backup wiederherstellen</h3>
+      <p>
+        Im Bereich <strong>Notfall</strong> findest du die Kachel
+        <strong>„Aus Backup wiederherstellen"</strong>. Damit erstellst du einen
+        <strong>neuen Tresor</strong> aus einer Sicherungsdatei
+        (siehe <a href="#backup">Backup &amp; Wiederherstellung</a>).
+      </p>
+
+      <h3>Tresor zurücksetzen</h3>
+      <p>
+        Die Kachel <strong>„Tresor zurücksetzen"</strong> (Bereich Notfall) löscht nach einer
+        Rückfrage alle im Browser gespeicherten Daten unwiderruflich und löst eine etwaige
+        Datei-Verknüpfung (die Datei selbst bleibt erhalten). Sie erscheint nur, wenn bereits ein
+        Tresor existiert.
+      </p>
+
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 4. Hauptansicht -->
+    <!-- ============================================================= -->
+    <section id="hauptansicht">
+      <h2><span class="ico">📋</span> Die Hauptansicht (Übersicht)</h2>
+      <p>
+        Nach dem Entsperren siehst du die Hauptansicht mit deinem Tresor. Sie besteht aus
+        Kopfzeile, Filterleiste, der Eintragsliste (links) und der Detailkarte (rechts).
+      </p>
+
+      <h3>Kopfzeile (oben)</h3>
+      <p>Die obere Navigation mit allen wichtigen Buttons:</p>
+      <table>
+        <tr><th>Button</th><th>Funktion</th></tr>
+        <tr><td><strong>+ Neuer Eintrag</strong></td><td>Öffnet das Formular zum Erstellen eines neuen Eintrags.</td></tr>
+        <tr><td><strong>Filter</strong></td><td>Klappt die Filterleiste auf/zu (Gruppe, Abos, Authenticator, Biometrie, PIN, 2FA, Passkey, Google-Verknüpfung).</td></tr>
+        <tr><td><strong>Gruppen</strong></td><td>Öffnet die Gruppenverwaltung: Gruppen anlegen, umbenennen, einfärben, löschen.</td></tr>
+        <tr><td><strong>Export</strong></td><td>Speichert den Tresor als JSON-Datei (verschlüsselt oder Klartext).</td></tr>
+        <tr><td><strong>Import</strong></td><td>Lädt Einträge aus einer JSON-Datei (Ergänzen oder Ersetzen).</td></tr>
+        <tr>
+          <td><strong>PDF</strong> <span class="ic-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span></td>
+          <td>Druckt alle aktuell <em>gefilterten</em> Einträge als Tabelle (siehe <a href="#drucken">Drucken / PDF</a>).</td>
+        </tr>
+        <tr>
+          <td><span class="ic-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span> Augen-Symbol</td>
+          <td>Blendet alle Passwörter ein/aus (siehe <a href="#passwort-verbergen">Passwörter verbergen</a>).</td>
+        </tr>
+        <tr>
+          <td><span class="ic-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span> Chevron</td>
+          <td>Klappt <strong>alle Gruppen</strong> auf einmal zu bzw. wieder auf.</td>
+        </tr>
+        <tr>
+          <td><span class="ic-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span> Schlüssel</td>
+          <td>Öffnet den <a href="#generator">Passwort-Generator</a> direkt aus der Kopfzeile (Passwort erzeugen und kopieren).</td>
+        </tr>
+        <tr>
+          <td><span class="ic-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Hilfe</td>
+          <td>Öffnet diese Anleitung in einem neuen Tab.</td>
+        </tr>
+        <tr>
+          <td><span class="ic-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span> Mond / Sonne</td>
+          <td>Wechselt zwischen Hell- und Dunkelmodus.</td>
+        </tr>
+        <tr><td><strong>Tresor sperren</strong></td><td>Sperrt den Tresor sofort.</td></tr>
+      </table>
+
+      <div class="card">
+        <strong>📌 Bleibt sichtbar beim Scrollen:</strong> Kopfzeile, die (offene) Filterleiste,
+        die Spaltenüberschriften der Liste und die Detailkarte bleiben beim Scrollen <strong>fixiert</strong> —
+        so behältst du Bedienelemente und den ausgewählten Eintrag immer im Blick.
+      </div>
+
+      <h3>Suchleiste</h3>
+      <p>
+        In der Kopfzeile sitzt eine <strong>Suchleiste</strong>
+        (<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>).
+        Tippe einfach den Namen eines Dienstes ein (z.&nbsp;B. „Gm" für Gmail) — die Liste filtert live,
+        während du tippst.
+      </p>
+
+      <h3>Filterleiste (ausklappbar)</h3>
+      <p>Über den Button „Filter" öffnet sich eine Leiste mit erweiterten Optionen:</p>
+      <ul class="bullets">
+        <li><strong>Gruppe:</strong> Nur Einträge einer bestimmten Gruppe zeigen.</li>
+        <li><strong>Abos:</strong> Nur Einträge mit aktivem Abo.</li>
+        <li><strong>Authenticator:</strong> Nur Einträge mit mindestens einer Authenticator-App.</li>
+        <li><strong>Biometrie:</strong> Nur Einträge mit aktiver Biometrie.</li>
+        <li><strong>PIN:</strong> Nur Einträge mit hinterlegter PIN.</li>
+        <li><strong>2FA:</strong> Nur Einträge mit aktiver Zwei-Faktor-Authentifizierung.</li>
+        <li><strong>Passkey:</strong> Nur Einträge mit aktiviertem Passkey.</li>
+        <li><strong>Google-Verknüpfung:</strong> Nur Einträge mit Google-Login.</li>
+        <li>
+          <strong>„Filter zurücksetzen"</strong>
+          (<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>):
+          Löscht alle Filter und die Suche auf einen Schlag.
+        </li>
+      </ul>
+
+      <h3>Linke Spalte: Eintragsliste (gruppiert)</h3>
+      <ul class="bullets">
+        <li>
+          <strong>Nach Gruppen gegliedert:</strong> Einträge stehen unter ihrer Gruppe.
+          „Ohne Gruppe" ist eine eigene Sektion am Ende.
+        </li>
+        <li>
+          <strong>Gruppen-Kopfzeile:</strong> Links der Aufklapp-Pfeil und der farbige Gruppenpunkt,
+          rechts ein Drucken-Button
+          (<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>)
+          für genau diese Gruppe und ganz rechts die Anzahl der Einträge.
+        </li>
+        <li>
+          <strong>Spalten:</strong> Dienst (mit Link-Symbol
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          falls eine URL hinterlegt ist), Username, E-Mail, Passwort.
+        </li>
+        <li>
+          <strong>Status-Badges:</strong> Direkt hinter dem Dienstnamen zeigen kleine Badges den
+          Status auf einen Blick (siehe nächster Abschnitt).
+        </li>
+        <li>
+          <strong>Auswählen:</strong> Klick auf eine Zeile wählt den Eintrag aus — rechts öffnet sich die Detailkarte.
+        </li>
+      </ul>
+
+      <h4>Status-Badges in der Liste</h4>
+      <p>Je nach gesetzten Feldern erscheinen hinter dem Dienstnamen ein oder mehrere Badges:</p>
+      <table>
+        <tr><th>Badge</th><th>Bedeutung</th></tr>
+        <tr><td><span class="b b-2fa">2FA</span></td><td>Zwei-Faktor-Authentifizierung ist aktiviert.</td></tr>
+        <tr><td><span class="b b-auth">Auth</span></td><td>Mindestens eine Authenticator-App ist hinterlegt. Der Tooltip (Maus darüber) zeigt welche.</td></tr>
+        <tr><td><span class="b b-google">Google</span></td><td>Der Dienst ist mit Google-Login verknüpft.</td></tr>
+        <tr><td><span class="b b-abo">Abo</span></td><td>Ein aktives Abo ist hinterlegt.</td></tr>
+        <tr><td><span class="b b-pay">Zahlungsmethode</span></td><td>Die eingegebene Zahlungsmethode (z.&nbsp;B. „PayPal", „ING", „Sparkasse") erscheint 1:1 als Badge.</td></tr>
+      </table>
+      <p style="color: var(--muted); font-size: 13px;">
+        Badges erscheinen nur, wenn der jeweilige Wert gesetzt ist — ist nichts gesetzt, bleibt die Zeile schlicht.
+      </p>
+
+      <h3>Rechte Spalte: Detailkarte (Info-Card)</h3>
+      <p>
+        Wenn du eine Zeile anklickst, öffnet sich rechts die <strong>Detailkarte</strong> mit allen
+        Informationen zum Eintrag. Oben rechts in der Karte sitzen die Aktions-Buttons:
+      </p>
+      <ul class="bullets">
+        <li>
+          <span class="ic-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></span>
+          <strong>Bearbeiten</strong> — öffnet das Eintrags-Formular.
+        </li>
+        <li>
+          <span class="ic-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>
+          <strong>Drucken</strong> — druckt nur diesen Eintrag.
+        </li>
+        <li>
+          <span class="ic-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span>
+          <strong>Löschen</strong> — entfernt den Eintrag (mit Sicherheitsabfrage).
+        </li>
+        <li>
+          <strong>Kopier-Buttons</strong>
+          (<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>)
+          neben den einzelnen Feldern kopieren den jeweiligen Wert in die Zwischenablage.
+        </li>
+      </ul>
+
+      <div class="card">
+        <strong>💡 Tipp:</strong> Bearbeiten, Drucken und Löschen eines Eintrags findest du
+        <em>ausschließlich</em> in der Detailkarte — die Liste bleibt dadurch schön aufgeräumt.
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- Icon-Übersicht -->
+    <!-- ============================================================= -->
+    <section id="icons">
+      <h2><span class="ico">✨</span> Icon-Übersicht</h2>
+      <p>Alle Symbole in KeyBook sind im gleichen schlanken Outline-Stil gehalten. Hier die wichtigsten:</p>
+      <table>
+        <tr><th>Symbol</th><th>Bedeutung</th></tr>
+        <tr><td><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Kopieren</td><td>Wert in die Zwischenablage kopieren.</td></tr>
+        <tr><td><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Link öffnen</td><td>Hinterlegte URL in neuem Tab öffnen.</td></tr>
+        <tr><td><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg> Bearbeiten</td><td>Eintrag oder Gruppe bearbeiten.</td></tr>
+        <tr><td><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Löschen</td><td>Eintrag oder Gruppe entfernen.</td></tr>
+        <tr><td><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Drucken</td><td>Eintrag, Gruppe oder Auswahl als PDF drucken.</td></tr>
+        <tr><td><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Passwörter zeigen</td><td>Passwörter im Klartext anzeigen.</td></tr>
+        <tr><td><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Passwörter verbergen</td><td>Passwörter maskieren (••••••••).</td></tr>
+        <tr><td><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg> Chevron</td><td>Gruppe(n) auf-/zuklappen.</td></tr>
+        <tr><td><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Zurücksetzen</td><td>Filter &amp; Suche zurücksetzen.</td></tr>
+        <tr><td><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Suchen</td><td>Suche auslösen.</td></tr>
+        <tr><td><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Hilfe</td><td>Diese Anleitung öffnen.</td></tr>
+        <tr><td><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> / <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Theme</td><td>Mond = Dunkelmodus aktivieren, Sonne = Hellmodus.</td></tr>
+      </table>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 5. Einträge -->
+    <!-- ============================================================= -->
+    <section id="eintraege">
+      <h2><span class="ico">📝</span> Einträge — Alle Felder</h2>
+      <p>
+        Ein <strong>Eintrag</strong> speichert alle Zugangsdaten und Infos zu einem Dienst.
+        Hier ein Überblick über alle Felder:
+      </p>
+
+      <h3>Basisdaten</h3>
+      <table>
+        <tr><th>Feld</th><th>Beschreibung</th></tr>
+        <tr><td><strong>Gruppe / Kategorie</strong></td><td>Ordnet den Eintrag einer Gruppe zu (z.&nbsp;B. „Streaming", „Banking"). Optional.</td></tr>
+        <tr><td><strong>mit Google verknüpft</strong></td><td>Checkbox: aktivieren, wenn der Dienst per Google-Login angemeldet ist. Zeigt das Badge <span class="b b-google">Google</span>.</td></tr>
+        <tr><td><strong>Dienst / Plattform *</strong></td><td><strong>Pflichtfeld!</strong> Name des Dienstes, z.&nbsp;B. „Gmail", „Netflix", „Sparkasse". Wird in Liste und Suche genutzt.</td></tr>
+        <tr><td><strong>Link (URL)</strong></td><td>Homepage oder Login-Seite, z.&nbsp;B. <code>https://www.gmail.com</code>. Wenn gesetzt, erscheint das Link-Symbol zum Öffnen.</td></tr>
+        <tr><td><strong>Username</strong></td><td>Benutzername oder Handle für den Login.</td></tr>
+        <tr><td><strong>Passwort</strong></td><td>Das Zugriffspasswort. Der Button „Generator" erzeugt ein sicheres Zufallspasswort oder eine Passphrase.</td></tr>
+        <tr><td><strong>E-Mail-Adresse</strong></td><td>E-Mail für Login oder Wiederherstellung.</td></tr>
+        <tr><td><strong>Telefonnummer</strong></td><td>Hinterlegte Telefonnummer, z.&nbsp;B. für SMS-Codes oder Kontakt.</td></tr>
+        <tr><td><strong>Notizen</strong></td><td>Freitext (mehrzeilig) für zusätzliche Infos. Zeilenumbrüche bleiben auch im Druck erhalten.</td></tr>
+      </table>
+
+      <h3>Sicherheit</h3>
+      <table>
+        <tr><th>Feld</th><th>Beschreibung</th></tr>
+        <tr><td><strong>2FA aktiviert</strong></td><td>Checkbox: Zwei-Faktor-Authentifizierung ist aktiv. Zeigt das Badge <span class="b b-2fa">2FA</span>.</td></tr>
+        <tr><td><strong>Passkey aktiviert</strong></td><td>Checkbox: Für den Dienst ist ein Passkey (passwortlose Anmeldung) hinterlegt.</td></tr>
+        <tr><td><strong>Biometrie aktiviert</strong></td><td>Checkbox: Anmeldung per Fingerabdruck oder Gesichtserkennung (z.&nbsp;B. Face&nbsp;ID, Windows&nbsp;Hello) ist aktiv.</td></tr>
+        <tr><td><strong>Passkey-Details</strong></td><td>Freitext: wo der Passkey hinterlegt ist, z.&nbsp;B. <em>„iPhone, YubiKey 5C"</em>.</td></tr>
+        <tr><td><strong>PIN</strong></td><td>Freitext: für den Dienst hinterlegte PIN bzw. ein Hinweis dazu.</td></tr>
+        <tr><td><strong>Authenticator-App(s)</strong></td><td>Mehrfachauswahl der genutzten Authenticator-Apps (z.&nbsp;B. Google Authenticator, Microsoft Authenticator, Authy, Aegis u.&nbsp;a.). Sobald mindestens eine aktiv ist, erscheint das Badge <span class="b b-auth">Auth</span>; die konkreten Apps stehen im Tooltip.</td></tr>
+        <tr><td><strong>Wiederherstellungs-Telefonnummer</strong></td><td>Hinterlegte Rufnummer zur Konto-Wiederherstellung (Recovery), z.&nbsp;B. für SMS-Codes beim Zurücksetzen.</td></tr>
+        <tr><td><strong>Wiederherstellungs-E-Mail-Adresse</strong></td><td>Alternative E-Mail-Adresse zur Konto-Wiederherstellung (Recovery).</td></tr>
+        <tr><td><strong>Sicherheitsfragen</strong></td><td>Antworten auf Sicherheitsfragen. Beispiel: <em>„Lieblingsfarbe: Blau"</em></td></tr>
+      </table>
+
+      <h3>Vertrag / Abo</h3>
+      <table>
+        <tr><th>Feld</th><th>Beschreibung</th></tr>
+        <tr><td><strong>Abo aktiv</strong></td><td>Checkbox: das Abo ist derzeit aktiv. Zeigt das Badge <span class="b b-abo">Abo</span> und wirkt im Filter „Abos".</td></tr>
+        <tr><td><strong>Info</strong></td><td>Freitext für zusätzliche Vertragsangaben, z.&nbsp;B. Tarif oder Modell.</td></tr>
+        <tr><td><strong>Zahlungsmethode</strong></td><td>Beliebiger Text (z.&nbsp;B. „PayPal", „ING", „Sparkasse"). Erscheint als Badge in der Liste.</td></tr>
+        <tr><td><strong>Kosten</strong></td><td>Freitext für den Betrag, z.&nbsp;B. <em>„9,99 €"</em>.</td></tr>
+        <tr><td><strong>Zahlungsweise</strong></td><td>Auswahl, wie oft gezahlt wird: einmalig, täglich, wöchentlich, monatlich, vierteljährlich oder jährlich.</td></tr>
+        <tr><td><strong>Vertragsstart</strong></td><td>Startdatum des Abos (Datums-Auswahl).</td></tr>
+        <tr><td><strong>Vertragsende</strong></td><td>Enddatum (bei unbegrenzten Abos optional).</td></tr>
+        <tr><td><strong>Kündigungsfrist</strong></td><td>z.&nbsp;B. „3 Monate", „30 Tage vor Enddatum".</td></tr>
+      </table>
+
+      <h3>Einen Eintrag anlegen oder bearbeiten</h3>
+      <ul class="steps">
+        <li><strong>Neuer Eintrag:</strong> Klick auf „+ Neuer Eintrag" in der Kopfzeile.</li>
+        <li><strong>Bearbeiten:</strong> Eintrag in der Liste anklicken, dann in der Detailkarte das Bearbeiten-Symbol.</li>
+        <li><strong>Ausfüllen:</strong> Daten eintragen. Das Feld „Dienst" ist Pflicht.</li>
+        <li><strong>Speichern:</strong> Klick auf „Speichern" — der Eintrag wird sofort verschlüsselt gespeichert.</li>
+      </ul>
+
+      <h3>Einen Eintrag löschen</h3>
+      <ul class="steps">
+        <li>Eintrag in der Liste auswählen.</li>
+        <li>In der Detailkarte das Löschen-Symbol anklicken.</li>
+        <li>Sicherheitsabfrage bestätigen — der Eintrag ist sofort weg.</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 6. Gruppen -->
+    <!-- ============================================================= -->
+    <section id="gruppen">
+      <h2><span class="ico">🗂️</span> Gruppen</h2>
+      <p>
+        <strong>Gruppen</strong> helfen, deine Einträge zu organisieren — z.&nbsp;B. „Streaming",
+        „Banking", „Arbeit", „Shopping".
+      </p>
+
+      <h3>Eine Gruppe anlegen</h3>
+      <ul class="steps">
+        <li>Klick auf „Gruppen" in der Kopfzeile.</li>
+        <li>Das Modal „Gruppen verwalten" öffnet sich.</li>
+        <li><strong>Name eingeben:</strong> z.&nbsp;B. „Streaming".</li>
+        <li><strong>Farbe wählen:</strong> Der farbige Punkt/Balken hilft bei der Übersicht.</li>
+        <li>Klick auf „Hinzufügen".</li>
+      </ul>
+
+      <h3>Eine Gruppe bearbeiten / löschen</h3>
+      <ul class="bullets">
+        <li><strong>Bearbeiten:</strong> In der Gruppenliste den Namen/Farbe ändern.</li>
+        <li><strong>Löschen:</strong> Die Einträge der Gruppe werden <em>nicht</em> gelöscht — sie landen in „Ohne Gruppe".</li>
+      </ul>
+
+      <h3>In der Hauptansicht</h3>
+      <ul class="bullets">
+        <li><strong>Gruppensicht:</strong> Die Liste ist nach Gruppen gegliedert, jede mit farbigem Punkt und auf-/zuklappbarem Kopf.</li>
+        <li>
+          <strong>Gruppe direkt drucken:</strong> In jeder Gruppen-Kopfzeile sitzt ein Drucken-Button
+          (<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>),
+          gefolgt von der Anzahl der Einträge.
+        </li>
+        <li><strong>„Ohne Gruppe":</strong> Einträge ohne Zuordnung stehen in einer eigenen Sektion am Ende.</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 7. Suchen & Filtern -->
+    <!-- ============================================================= -->
+    <section id="suchen">
+      <h2><span class="ico">🔎</span> Suchen &amp; Filtern</h2>
+      <p>Mit Suche und Filter findest du schnell die richtigen Einträge.</p>
+
+      <h3>Suche (Live-Filterung)</h3>
+      <ul class="bullets">
+        <li><strong>Tippen:</strong> Beginne, den Dienstnamen einzugeben (z.&nbsp;B. „gm" für Gmail).</li>
+        <li><strong>Live-Update:</strong> Die Liste filtert sofort, während du schreibst.</li>
+        <li><strong>Leeren:</strong> Über das ×-Symbol in der Suchleiste.</li>
+      </ul>
+
+      <h3>Filterleiste</h3>
+      <table>
+        <tr><th>Filter</th><th>Beschreibung</th></tr>
+        <tr><td><strong>Gruppe</strong></td><td>Nur Einträge einer bestimmten Gruppe (oder alle).</td></tr>
+        <tr><td><strong>Abos</strong></td><td>Nur Einträge mit aktivem Abo.</td></tr>
+        <tr><td><strong>Authenticator</strong></td><td>Nur Einträge mit mindestens einer Authenticator-App.</td></tr>
+        <tr><td><strong>Biometrie</strong></td><td>Nur Einträge mit aktiver Biometrie.</td></tr>
+        <tr><td><strong>PIN</strong></td><td>Nur Einträge mit hinterlegter PIN.</td></tr>
+        <tr><td><strong>2FA</strong></td><td>Nur Einträge mit aktivem 2FA.</td></tr>
+        <tr><td><strong>Passkey</strong></td><td>Nur Einträge mit aktiviertem Passkey.</td></tr>
+        <tr><td><strong>Google-Verknüpfung</strong></td><td>Nur Einträge mit Google-Login.</td></tr>
+      </table>
+
+      <h3>Filter kombinieren</h3>
+      <ul class="bullets">
+        <li><strong>Gruppe „Streaming" + „Abos":</strong> nur aktive Streaming-Abos.</li>
+        <li><strong>Suche „bank" + Gruppe „Banking":</strong> Banking-Dienste mit „bank" im Namen.</li>
+        <li><strong>„2FA" + „Google-Verknüpfung":</strong> Dienste, die <strong>beides</strong> haben.</li>
+      </ul>
+
+      <h3>Filter zurücksetzen</h3>
+      <p>
+        Der Button „Filter zurücksetzen"
+        (<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>)
+        in der Filterleiste löscht alle aktiven Filter und die Suche auf einmal.
+      </p>
+
+      <div class="card">
+        <strong>💡 Hinweis:</strong> Die aktuelle Filterung wirkt sich auch auf
+        <strong>„PDF"</strong> und den Export aus — du druckst / exportierst also nur die angezeigten Einträge.
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 8. Passwort-Generator -->
+    <!-- ============================================================= -->
+    <section id="generator">
+      <h2><span class="ico">🎲</span> Passwort-Generator</h2>
+      <p>
+        Der Generator erzeugt sichere Zufallspasswörter mit der kryptografisch sicheren
+        Funktion <code>crypto.getRandomValues</code> des Browsers.
+      </p>
+
+      <h3>Generator öffnen</h3>
+      <p>Im Eintrags-Formular (Anlegen/Bearbeiten) den Button <strong>„Generator"</strong> neben dem Passwort-Feld anklicken.
+        Alternativ öffnet das <strong>Schlüssel-Symbol</strong> in der Kopfzeile den Generator ohne Eintrag
+        (dort gibt es nur „Kopieren", kein „In Eintrag übernehmen").
+        <br />Auch auf dem <a href="#sperrbildschirm">Sperrbildschirm</a> steht oben rechts ein Knopf
+        <strong>„Generator"</strong> bereit — beim ersten Start sogar mit
+        „Als Master-Passwort übernehmen".</p>
+
+      <p>
+        Oben im Generator wählst du über zwei Reiter zwischen <strong>„Passwort"</strong>
+        (zufällige Zeichen) und <strong>„Passphrase"</strong> (mehrere echte Wörter, leichter zu merken).
+      </p>
+
+      <h3>Reiter „Passwort"</h3>
+      <table>
+        <tr><th>Einstellung</th><th>Beschreibung</th></tr>
+        <tr><td><strong>Länge</strong></td><td>Schieber 6–64 Zeichen, Standard 16. Länger = sicherer (sofern der Dienst es erlaubt).</td></tr>
+        <tr><td><strong>Großbuchstaben (A–Z)</strong></td><td>Einbeziehen (Standard: ein).</td></tr>
+        <tr><td><strong>Kleinbuchstaben (a–z)</strong></td><td>Einbeziehen (Standard: ein).</td></tr>
+        <tr><td><strong>Zahlen (0–9)</strong></td><td>Einbeziehen (Standard: ein).</td></tr>
+        <tr><td><strong>Sonderzeichen (!@#…)</strong></td><td>Einbeziehen (Standard: ein).</td></tr>
+      </table>
+
+      <h3>Reiter „Passphrase"</h3>
+      <p>
+        Setzt eine Wortfolge aus einer Liste von rund 420 deutschen Wörtern zusammen –
+        z.&nbsp;B. <em>Berg-Hirsch-Wald-Fuchs-Sturm</em>. Solche Passphrasen sind leichter zu
+        merken und trotzdem sicher (5 Wörter ≈ 44&nbsp;Bit, 8 Wörter ≈ 70&nbsp;Bit Entropie).
+      </p>
+      <table>
+        <tr><th>Einstellung</th><th>Beschreibung</th></tr>
+        <tr><td><strong>Wörter</strong></td><td>Schieber 3–8 Wörter, Standard 5. Mehr Wörter = sicherer.</td></tr>
+        <tr><td><strong>Ersten Buchstaben groß</strong></td><td>Jedes Wort beginnt mit einem Großbuchstaben (Standard: ein). Aus = alles klein.</td></tr>
+        <tr><td><strong>Zahl anhängen</strong></td><td>Hängt am Ende eine Zufallszahl an (Standard: aus).</td></tr>
+        <tr><td><strong>Trennzeichen</strong></td><td>Zeichen zwischen den Wörtern: Bindestrich, Punkt, Unterstrich, Leerzeichen oder „Kein Trennzeichen".</td></tr>
+      </table>
+
+      <h3>Verwenden</h3>
+      <ul class="steps">
+        <li><strong>Reiter wählen</strong> (Passwort oder Passphrase) und <strong>Einstellungen anpassen</strong>.</li>
+        <li><strong>Generieren:</strong> Das neue Passwort/die Passphrase erscheint im Feld.</li>
+        <li><strong>Kopieren</strong> oder direkt <strong>in den Eintrag übernehmen</strong>.</li>
+        <li><strong>Speichern:</strong> Generator schließen und Eintrag speichern.</li>
+      </ul>
+
+      <div class="card">
+        <strong>💡 Sicherheits-Tipp:</strong> Nutze für jeden Dienst ein eigenes Passwort.
+        Wird ein Dienst gehackt, sind die anderen Accounts nicht gefährdet.
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 9. Kopieren -->
+    <!-- ============================================================= -->
+    <section id="kopieren">
+      <h2><span class="ico">📎</span> Kopieren</h2>
+      <p>
+        Neben wichtigen Feldern findest du ein <strong>Kopier-Symbol</strong>
+        (<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>).
+        Ein Klick kopiert den Wert in die Zwischenablage.
+      </p>
+
+      <h3>Wo es funktioniert</h3>
+      <ul class="bullets">
+        <li><strong>In der Liste:</strong> Username, E-Mail und Passwort direkt aus der Tabellenzeile.</li>
+        <li><strong>In der Detailkarte:</strong> jeder angezeigte Wert.</li>
+      </ul>
+
+      <h3>Auto-Löschung nach 30 Sekunden</h3>
+      <p>Aus Sicherheitsgründen wird die Zwischenablage <strong>automatisch nach 30 Sekunden</strong> geleert. Ein kurzer Hinweis (Toast) bestätigt das.</p>
+
+      <h3>Sofort löschen beim Sperren</h3>
+      <p>Beim Sperren (manuell oder automatisch) wird die Zwischenablage <strong>sofort vollständig geleert</strong> — auch vor Ablauf der 30 Sekunden.</p>
+
+      <div class="note warn">
+        <strong>⚠️ Wichtig:</strong> Die Zwischenablage ist Teil des Betriebssystems, nicht von KeyBook.
+        Theoretisch könnten andere Programme sie auslesen, bevor sie geleert wird.
+        <br /><br />
+        <strong>Empfehlung:</strong> Kopierte Passwörter direkt beim Dienst einfügen und nicht in anderen Apps zwischenlagern.
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 10. Links öffnen -->
+    <!-- ============================================================= -->
+    <section id="links">
+      <h2><span class="ico">🌐</span> Links öffnen</h2>
+      <p>Hast du für einen Eintrag eine URL hinterlegt, lässt sie sich schnell öffnen.</p>
+
+      <h3>URL speichern</h3>
+      <ul class="bullets">
+        <li>Im Eintrags-Formular (Basisdaten) das Feld <strong>„Link (URL)"</strong> ausfüllen, z.&nbsp;B. <code>https://www.gmail.com</code>.</li>
+        <li>Eintrag speichern.</li>
+      </ul>
+
+      <h3>Link öffnen</h3>
+      <p>
+        In der Liste erscheint neben dem Dienstnamen das <strong>Link-Symbol</strong>
+        (<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>),
+        wenn eine URL hinterlegt ist. Ein Klick öffnet die Website in einem neuen Tab — KeyBook bleibt geöffnet.
+      </p>
+
+      <div class="card">
+        <strong>💡 Workflow-Tipp:</strong>
+        <br />1. Eintrag in der Liste anklicken.
+        <br />2. Link-Symbol klicken → Dienst öffnet sich.
+        <br />3. Username kopieren → einfügen.
+        <br />4. Passwort kopieren → einfügen.
+        <br />5. Anmelden!
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 11. Passwörter verbergen -->
+    <!-- ============================================================= -->
+    <section id="passwort-verbergen">
+      <h2><span class="ico">🙈</span> Passwörter verbergen / anzeigen</h2>
+      <p>
+        Aus Sicherheit sind Passwörter standardmäßig <strong>verborgen</strong> (••••••••).
+        Du kannst sie jederzeit ein- und ausblenden.
+      </p>
+
+      <h3>Augen-Button in der Kopfzeile</h3>
+      <p>
+        Rechts in der Kopfzeile sitzt der Augen-Button. Sind die Passwörter verborgen, zeigt er ein
+        durchgestrichenes Auge
+        (<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>);
+        sind sie sichtbar, ein offenes Auge
+        (<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>).
+      </p>
+      <ul class="bullets">
+        <li><strong>Klick:</strong> alle Passwörter werden sichtbar (Klartext).</li>
+        <li><strong>Nochmal Klick:</strong> alle Passwörter werden wieder maskiert.</li>
+      </ul>
+
+      <h3>Wo wirkt es?</h3>
+      <ul class="bullets">
+        <li>In der Passwort-Spalte der Liste.</li>
+        <li>Im Passwort-Feld der Detailkarte.</li>
+      </ul>
+
+      <h3>Kopieren funktioniert immer</h3>
+      <p>Auch bei verborgenen Passwörtern kopiert das Kopier-Symbol stets den echten Wert — nicht die Punkte.</p>
+
+      <div class="note warn">
+        <strong>⚠️ Hinweis:</strong> Zeige Passwörter nicht im Klartext, wenn jemand mitlesen könnte.
+        Verberge sie, bevor du den PC verlässt.
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 12. Drucken / PDF -->
+    <!-- ============================================================= -->
+    <section id="drucken">
+      <h2><span class="ico">🖨️</span> Drucken / PDF</h2>
+      <p>KeyBook druckt deine Einträge übersichtlich oder speichert sie als PDF.</p>
+
+      <h3>Alle (gefilterten) Einträge drucken</h3>
+      <p>Der Button <strong>„PDF"</strong> in der Kopfzeile:</p>
+      <ul class="steps">
+        <li><strong>Filter anwenden (optional):</strong> Suche/Filter, um nur bestimmte Einträge zu zeigen.</li>
+        <li><strong>„PDF" klicken:</strong> ein Dialog listet alle Gruppen mit der Anzahl der Einträge.
+          Hake die Gruppen an, die gedruckt werden sollen („Alle" / „Keine" helfen beim Auswählen), und
+          klicke auf <strong>„Drucken"</strong> — die Druckvorschau öffnet sich.</li>
+        <li><strong>Als PDF speichern:</strong> im Druckdialog → Ziel „Als PDF speichern".</li>
+        <li><strong>Speichern:</strong> Dateinamen vergeben (z.&nbsp;B. „KeyBook_Backup.pdf").</li>
+      </ul>
+
+      <h3>Eine ganze Gruppe drucken</h3>
+      <p>
+        Über den Drucken-Button
+        (<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>)
+        in der Gruppen-Kopfzeile druckst du genau diese Gruppe.
+      </p>
+
+      <h3>Einzelnen Eintrag drucken</h3>
+      <p>
+        In der Detailkarte das Drucken-Symbol
+        (<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>)
+        anklicken — gedruckt wird nur der ausgewählte Eintrag.
+      </p>
+
+      <h3>Tabellen-Layout (Druck)</h3>
+      <p>Die Druckausgabe ist eine <strong>Tabelle, nach Gruppe sortiert</strong>:</p>
+      <ul class="bullets">
+        <li>
+          <strong>Spalten:</strong> Dienst · Username · E-Mail · Passwort · Notizen / Sicherheit.
+          <br />Die letzte Spalte zeigt zuerst die <strong>Notizen</strong> (mit erhaltenen Zeilenumbrüchen)
+          und darunter die <strong>Sicherheitsangaben</strong>.
+        </li>
+        <li>
+          <strong>Sicherheitsangaben:</strong> 2FA und „Google verknüpft" erscheinen nur,
+          wenn sie aktiv sind (negative Werte werden weggelassen); Authenticator-Apps, Telefon und Sicherheitsfragen nur, wenn hinterlegt.
+        </li>
+        <li>
+          <strong>Gruppierung:</strong> eine Sektion pro Gruppe (alphabetisch), „Ohne Gruppe" am Ende.
+        </li>
+        <li>
+          <strong>Farben:</strong> Gruppennamen werden mit der Gruppenfarbe hinterlegt (bleibt im Druck sichtbar).
+        </li>
+      </ul>
+
+      <div class="note warn">
+        <strong>⚠️ Sicherheits-Warnung:</strong> Das Druck-PDF enthält <strong>alle Passwörter im Klartext!</strong>
+        <br /><br />
+        <strong>Nur drucken, wenn:</strong>
+        <br />• du am eigenen Computer bist,
+        <br />• niemand anderes den Ausdruck sieht,
+        <br />• du den Ausdruck sicher verwahrst,
+        <br />• du danach Datei und Druckhistorie löschst.
+      </div>
+
+      <p style="color: var(--muted); font-size: 13px;">
+        Nach dem Drucken räumt KeyBook seinen internen Druckcontainer wieder auf — der Klartext bleibt nicht im Speicher der Seite.
+      </p>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 13. Backup & Wiederherstellung -->
+    <!-- ============================================================= -->
+    <section id="backup">
+      <h2><span class="ico">💾</span> Backup &amp; Wiederherstellung</h2>
+      <p>Regelmäßige Backups sind essenziell. KeyBook bietet Export, Import und Wiederherstellung.</p>
+
+      <h3>Export / Sichern</h3>
+      <p>Button „Export" in der Kopfzeile:</p>
+      <h4>Option 1: Verschlüsselt (empfohlen)</h4>
+      <ul class="steps">
+        <li>„Export" → „🔒 Verschlüsselt".</li>
+        <li>Die Datei wird mit deinem <strong>aktuellen Master-Passwort</strong> verschlüsselt — ohne Passwort unlesbar.</li>
+        <li>Datei an einem sicheren Ort speichern (USB-Stick, externe Platte, Cloud).</li>
+      </ul>
+      <h4>Option 2: Klartext (JSON)</h4>
+      <ul class="steps">
+        <li>„Export" → „📄 Klartext (JSON)".
+          <br /><strong>⚠️ Warnung:</strong> Die Datei enthält alle Passwörter lesbar!</li>
+        <li>Nur für Notfälle. Datei sorgfältig sichern und nach Gebrauch löschen.</li>
+      </ul>
+
+      <h3>Import (im entsperrten Zustand)</h3>
+      <ul class="steps">
+        <li>„Import" → Dateiauswahl öffnet sich.</li>
+        <li><code>.json</code>-Datei wählen (verschlüsselt oder Klartext).</li>
+        <li>Bei verschlüsselter Datei: das damalige Master-Passwort der Datei eingeben.</li>
+        <li>Zusammenfassung erscheint („X Gruppen und Y Einträge gefunden").</li>
+        <li>
+          <strong>Ergänzen (Merge):</strong> neue hinzufügen, bestehende aktualisieren.
+          <br /><strong>Ersetzen (Replace):</strong> alles löschen und nur die Datei laden.
+        </li>
+      </ul>
+
+      <h3>Wiederherstellen (vom Sperrbildschirm)</h3>
+      <p>
+        Der Button <strong>„Aus Backup wiederherstellen"</strong> auf dem Sperrbildschirm
+        legt einen <strong>neuen Tresor</strong> an — sinnvoll auf einem neuen Rechner/Browser oder nach einem Crash.
+      </p>
+      <ul class="steps">
+        <li>Auf dem Sperrbildschirm „Aus Backup wiederherstellen" klicken.</li>
+        <li>Backup-Datei wählen.</li>
+        <li><strong>Verschlüsselt:</strong> das Master-Passwort der Datei eingeben — es wird zum Passwort des neuen Tresors.</li>
+        <li><strong>Klartext:</strong> ein neues Master-Passwort im Setup-Formular festlegen.</li>
+        <li>Der neue Tresor wird mit den Backup-Daten erstellt.</li>
+      </ul>
+
+      <div class="note warn">
+        <strong>⚠️ Achtung:</strong> Neuen Tresor anlegen, Import mit „Ersetzen" und Wiederherstellen
+        <strong>überschreiben</strong> einen bestehenden Tresor. Existiert bereits einer, fragt KeyBook
+        vorher zur Bestätigung. Normales Arbeiten (Anlegen/Bearbeiten/Löschen) speichert dagegen automatisch
+        und sicher in den Browser.
+      </div>
+
+      <div class="note">
+        <strong>💾 Backup-Plan:</strong>
+        <br />1. Alle 1–2 Wochen einen verschlüsselten Export erstellen.
+        <br />2. An einem sicheren Ort aufbewahren.
+        <br />3. Ein Mal pro Monat das Wiederherstellen testen.
+        <br />4. Beim Master-Passwort-Wechsel neu exportieren.
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 14. Tresor-Datei verknüpfen -->
+    <!-- ============================================================= -->
+    <section id="tresor-datei">
+      <h2><span class="ico">📄</span> Tresor-Datei verknüpfen</h2>
+      <p>
+        Normalerweise speichert KeyBook den Tresor <strong>im Browser</strong>. Alternativ kannst du ihn
+        an eine <strong>Datei auf deiner Festplatte</strong> binden — dann liegt der (weiterhin
+        verschlüsselte) Tresor dort, und du kannst ihn selbst sichern, verschieben oder kopieren.
+      </p>
+
+      <div class="note warn">
+        <strong>⚠️ Nur Chrome, Edge und andere Chromium-Browser.</strong> In Firefox und Safari sind die
+        Knöpfe nicht sichtbar; dort funktioniert KeyBook wie gewohnt mit Speicherung im Browser.
+      </div>
+
+      <h3>Einrichten</h3>
+      <p>Auf dem <strong>Sperrbildschirm</strong> stehen im Bereich <strong>Speicherort</strong> zwei Kacheln bereit:</p>
+      <ul class="steps">
+        <li><strong>„Neue Tresor-Datei"</strong> — Speicherort wählen, danach ein
+          Master-Passwort festlegen. Der neue Tresor wird direkt in dieser Datei angelegt.</li>
+        <li><strong>„Tresor-Datei öffnen"</strong> — eine zuvor angelegte Datei auswählen
+          und mit dem zugehörigen Master-Passwort entsperren.</li>
+      </ul>
+      <p>
+        War zuvor bereits ein Tresor <em>im Browser</em> gespeichert, fragt KeyBook nach und
+        entfernt ihn beim Wechsel — die Daten liegen danach nur noch in der Datei. Sichere
+        deinen bisherigen Tresor also vorher per <a href="#backup">Export</a>.
+      </p>
+      <p>
+        Beim Verknüpfen fragt der Browser einmalig nach der Erlaubnis, die Datei lesen und schreiben zu
+        dürfen. Diese Erlaubnis musst du bestätigen — ohne sie kann KeyBook nicht speichern.
+      </p>
+
+      <h3>Nach einem Browser-Neustart</h3>
+      <p>
+        Aus Sicherheitsgründen vergibt der Browser das Schreibrecht nicht dauerhaft. Beim nächsten Start
+        erscheint deshalb der Knopf <strong>„Zugriff auf die Datei erlauben"</strong> — ein Klick
+        genügt, der Datei-Dialog öffnet sich nicht erneut. Danach wie gewohnt das Master-Passwort eingeben.
+      </p>
+
+      <h3>Im entsperrten Zustand</h3>
+      <ul class="steps">
+        <li>Solange eine Datei verknüpft ist, erscheint in der Kopfzeile der Button <strong>„Tresor lösen"</strong>.</li>
+        <li>Ein Klick darauf öffnet ein Fenster mit Infos zur verknüpften Datei (Dateiname, letzter Stand,
+          Anzahl Einträge und Gruppen) und einer kurzen Erklärung. Über <strong>„Verknüpfung lösen"</strong>
+          wird die Verknüpfung aufgehoben: Die Datei bleibt erhalten; der Tresor
+          wandert zurück in den Browser und wird dort sofort gespeichert.</li>
+        <li>Ist die Datei zwischenzeitlich <strong>gelöscht oder verschoben</strong> worden, fragt
+          KeyBook beim Speichern nach, ob sie am ursprünglichen Ort neu angelegt werden soll —
+          sie verschwindet also nie unbemerkt.</li>
+        <li>Erscheint <strong>„⚠ Nicht gespeichert"</strong>, ist ein Speichervorgang fehlgeschlagen —
+          etwa weil ein USB-Stick abgezogen wurde oder das Schreibrecht entzogen ist. Der Hinweis bleibt
+          stehen, bis wieder erfolgreich gespeichert wurde. <strong>Schließe das Fenster in diesem Fall
+          nicht</strong>, sondern behebe die Ursache und speichere erneut.</li>
+      </ul>
+
+      <div class="note">
+        <strong>💡 Gut zu wissen:</strong>
+        <br />• Der Inhalt der Datei ist genauso verschlüsselt wie im Browser — wer sie findet, kann ohne
+        dein Master-Passwort nichts damit anfangen.
+        <br />• Im Datei-Modus liegen die Daten <strong>ausschließlich in der Datei</strong> — KeyBook
+        behält bewusst keine Kopie im Browser. Sorge deshalb für regelmäßige Backups
+        (<a href="#backup">Export</a>).
+        <br />• Eine Tresor-Datei lässt sich auch über
+        <a href="#backup">„Aus Backup wiederherstellen"</a> bzw. „Import" einlesen — nützlich
+        in Firefox/Safari, wo sich Dateien nicht direkt verknüpfen lassen. Du wirst dann nach dem
+        Master-Passwort der Datei gefragt.
+        <br />• Verschiebst oder kopierst du den KeyBook-Ordner, geht die <em>Verknüpfung</em> verloren —
+        <strong>nicht aber die Datei</strong>. Verknüpfe sie am neuen Ort einfach erneut über
+        „Tresor-Datei öffnen".
+        <br />• Gleiches gilt nach einer <strong>Neuinstallation des Browsers</strong>: Zeigt der
+        Sperrbildschirm „Die Verknüpfung … ist nicht mehr gültig", ist die Datei unverändert —
+        wähle sie einfach erneut über „Tresor-Datei öffnen" aus.
+        <br />• Öffne KeyBook möglichst nur in <strong>einem</strong> Fenster. Bearbeitest du dieselbe
+        Datei parallel in zwei Tabs, meldet KeyBook beim Speichern eine zwischenzeitliche Änderung und
+        fragt nach, bevor etwas überschrieben wird.
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 15. Sicherheit & Datenschutz -->
+    <!-- ============================================================= -->
+    <section id="sicherheit">
+      <h2><span class="ico">🛡️</span> Sicherheit &amp; Datenschutz</h2>
+      <p>KeyBook ist von Grund auf für maximale Sicherheit konzipiert. Hier die technischen Details und Best Practices.</p>
+
+      <h3>Verschlüsselung</h3>
+      <table>
+        <tr><th>Aspekt</th><th>Details</th></tr>
+        <tr>
+          <td><strong>Algorithmus</strong></td>
+          <td><strong>AES-GCM-256</strong> — moderner Standard. GCM authentifiziert die Daten und erkennt Manipulation.</td>
+        </tr>
+        <tr>
+          <td><strong>Schlüsselableitung</strong></td>
+          <td><strong>PBKDF2-HMAC-SHA256, 600.000&nbsp;Iterationen.</strong> Macht Brute-Force-Angriffe teuer.</td>
+        </tr>
+        <tr>
+          <td><strong>Salt</strong></td>
+          <td>Zufälliger Salt pro Tresor, mit den Daten gespeichert — gleiche Passwörter ergeben nie denselben Blob.</td>
+        </tr>
+        <tr>
+          <td><strong>Speicherung</strong></td>
+          <td>Verschlüsselt im <code>localStorage</code>. Format: <code>{ v, iter, salt, iv, data }</code> (alles base64).</td>
+        </tr>
+      </table>
+
+      <h3>Laufzeit-Sicherheit</h3>
+      <ul class="bullets">
+        <li><strong>Schlüssel im RAM:</strong> Nach dem Entsperren nur im Speicher, nie auf der Festplatte.</li>
+        <li><strong>Beim Sperren:</strong> Schlüssel wird gelöscht, Zwischenablage sofort geleert.</li>
+        <li><strong>Auto-Lock nach 2&nbsp;Min:</strong> verhindert vergessenes Entsperren.</li>
+      </ul>
+
+      <h3>Authentifizierung</h3>
+      <ul class="bullets">
+        <li><strong>Falsches Passwort:</strong> Der GCM-Auth-Tag schlägt fehl — Entschlüsselung unmöglich, „Passwort falsch".</li>
+        <li><strong>Keine Wiederherstellung:</strong> Kein Admin-Modus, kein Master-Schlüssel, kein Reset-Code.</li>
+      </ul>
+
+      <h3>Netzwerk &amp; Datenschutz</h3>
+      <ul class="bullets">
+        <li><strong>Keine Cloud:</strong> 100&nbsp;% offline — Daten verlassen den Computer nie.</li>
+        <li><strong>Keine Internetverbindung nötig:</strong> läuft auch im Flugmodus.</li>
+        <li><strong>Kein Tracking:</strong> keine Cookies, keine Pixel, keine Analyse.</li>
+        <li><strong>Kein Backend:</strong> kein Server, der gehackt werden könnte.</li>
+      </ul>
+
+      <h3>Browser-Sicherheit</h3>
+      <ul class="bullets">
+        <li><strong>Content Security Policy (CSP):</strong> blockiert externe Verbindungen.</li>
+        <li><strong>Keine externen Abhängigkeiten:</strong> reines Vanilla&nbsp;JS, keine npm-Pakete, kein CDN.</li>
+        <li><strong>Sichere Kontexte:</strong> Krypto funktioniert unter <code>file://</code> und <code>localhost</code>.</li>
+      </ul>
+
+      <h3>Best Practices</h3>
+      <table>
+        <tr><th>Maßnahme</th><th>Grund</th></tr>
+        <tr><td><strong>Starkes Master-Passwort</strong></td><td>Alle Sicherheit hängt davon ab.</td></tr>
+        <tr><td><strong>Tresor sperren beim Verlassen</strong></td><td>Schützt vor physischem Zugriff.</td></tr>
+        <tr><td><strong>Regelmäßige verschlüsselte Backups</strong></td><td>Schutz vor Datenverlust.</td></tr>
+        <tr><td><strong>Browser aktuell halten</strong></td><td>Sicherheitsupdates für die Web-Crypto-API.</td></tr>
+        <tr><td><strong>Eindeutige Passwörter pro Dienst</strong></td><td>Ein Leak gefährdet nicht alle Accounts.</td></tr>
+      </table>
+
+      <div class="note warn">
+        <strong>⚠️ Haftungsausschluss:</strong> KeyBook wird bereitgestellt, wie es ist. Kein Code ist 100&nbsp;% sicher.
+        <br /><br />
+        <strong>Du trägst Verantwortung für:</strong>
+        <br />• dein Master-Passwort sicher zu verwahren,
+        <br />• regelmäßige Backups,
+        <br />• einen sauberen Computer (keine Malware),
+        <br />• aktuelle Browser-/Betriebssystem-Updates.
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- Footer -->
+    <!-- ============================================================= -->
+    <footer>
+      KeyBook — Benutzeranleitung · Läuft offline, ganz ohne Cloud, komplett in deinem Browser.
+    </footer>
+
+  </div>
+</body>
+</html>

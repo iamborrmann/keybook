@@ -1,0 +1,1260 @@
+/* ================================================================
+   KeyBook — styles.css
+   Helles, minimalistisches Interface. CSS-Variablen für die Palette,
+   abgerundete Ecken, dezente Schatten, klare Typografie.
+   ================================================================ */
+
+/* ----------------------------------------------------------------
+   1. Design Tokens / Variablen
+   ---------------------------------------------------------------- */
+:root {
+  /* Warme Sandtöne als Basis */
+  --color-bg: #f3ecdd;             /* Sand */
+  --color-surface: #fffdf8;        /* warmes Cremeweiß */
+  --color-surface-2: #faf4e8;      /* heller Sand */
+  --color-border: #e5dac4;         /* sandiger Rahmen */
+  --color-text: #382f23;           /* dunkles Espresso-Braun */
+  --color-text-muted: #8a7d68;     /* gedämpftes Taupe */
+  /* Terrakotta/Lehm als Hauptakzent */
+  --color-primary: #a85f2c;
+  --color-primary-hover: #8c4d22;
+  --color-primary-soft: #f2e3d0;   /* helle Lehm-Tönung (Auswahl/Badges) */
+  --color-danger: #c0392b;
+  --color-danger-hover: #9e2f22;
+  --color-success: #6f8f4e;        /* Oliv-/Salbeigrün */
+
+  /* Zusatz-Tokens (vorher hartkodiert) – ermöglichen sauberen Darkmode */
+  --color-hover: #efe6d4;          /* Hover-Hintergrund für Icon-Buttons */
+  --color-dash: #ece2cf;           /* gestrichelte Trennlinie in der Card */
+  --color-empty: #c4b79f;          /* Platzhalter „—" für leere Felder */
+  --color-warn-bg: #fdf3df;
+  --color-warn-text: #8a5a1a;
+  --color-error-bg: #fbeae6;
+  --color-count-bg: rgba(255, 255, 255, 0.55);
+  --lock-grad-1: #f2e3d0;          /* sanfter Lehm-Verlauf */
+  --lock-grad-2: #f3ecdd;
+  --toast-bg: #382f23;
+  --copied-bg: var(--color-success);
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  --shadow-sm: 0 1px 2px rgba(76, 56, 28, 0.07);
+  --shadow-md: 0 4px 12px rgba(76, 56, 28, 0.10);
+  --shadow-lg: 0 12px 32px rgba(76, 56, 28, 0.18);
+
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+}
+
+/* ----------------------------------------------------------------
+   1b. Dark Theme (aktiv über <html data-theme="dark">)
+   ---------------------------------------------------------------- */
+:root[data-theme="dark"] {
+  /* Neutrale Grautöne als Basis */
+  --color-bg: #1a1c1b;
+  --color-surface: #232726;
+  --color-surface-2: #2b302e;
+  --color-border: #3a403d;
+  --color-text: #e5e8e6;
+  --color-text-muted: #97a39d;      /* piniengrün-grau */
+  /* Piniengrün als Akzent */
+  --color-primary: #6e9e80;
+  --color-primary-hover: #85b497;
+  --color-primary-soft: #2b3a32;    /* dunkle Piniengrün-Tönung (Auswahl/Badges) */
+  --color-danger: #e08a82;
+  --color-danger-hover: #ecaaa3;
+  --color-success: #74b58c;
+
+  --color-hover: #313835;
+  --color-dash: #313835;
+  --color-empty: #5d6764;
+  --color-warn-bg: #36301c;
+  --color-warn-text: #e8cd8f;
+  --color-error-bg: #382422;
+  --color-count-bg: rgba(0, 0, 0, 0.25);
+  --lock-grad-1: #243029;           /* dezenter Piniengrün-Verlauf */
+  --lock-grad-2: #1a1c1b;
+  --toast-bg: #2f3633;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+:root[data-theme="dark"] input[type="checkbox"] { color-scheme: dark; }
+
+/* ----------------------------------------------------------------
+   2. Reset / Basis
+   ---------------------------------------------------------------- */
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { margin: 0; font-weight: 600; }
+[hidden] { display: none !important; }
+
+/* ----------------------------------------------------------------
+   3. Buttons
+   ---------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+.btn-block { width: 100%; }
+
+.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary:hover { background: var(--color-primary-hover); }
+
+.btn-ghost {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+.btn-ghost:hover { background: var(--color-surface-2); border-color: #cdd2d9; }
+
+.btn-danger { background: var(--color-danger); color: #fff; }
+.btn-danger:hover { background: var(--color-danger-hover); }
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  padding: 4px;
+  text-decoration: underline;
+}
+.btn-link:hover { color: var(--color-primary-hover); }
+
+/* Inline-SVG-Icons: Größe folgt der font-size (1em), Farbe dem Theme.
+   Strichstärke pro Kontext über CSS `stroke-width` justierbar. */
+.icon {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: middle;
+  flex: 0 0 auto;
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+/* ----------------------------------------------------------------
+   4. Formularfelder
+   ---------------------------------------------------------------- */
+.field { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
+.field > span { font-size: 13px; color: var(--color-text-muted); font-weight: 500; }
+.field-grow { flex: 1 1 auto; }
+.field-inline { flex-direction: row; align-items: center; gap: 8px; }
+.field-inline > span { white-space: nowrap; }
+
+input[type="text"], input[type="email"], input[type="tel"], input[type="date"],
+input[type="url"], input[type="password"], input[type="search"], select, textarea {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+textarea { resize: vertical; }
+input[type="color"] {
+  padding: 1px;
+  height: 38px;
+  width: 38px;
+  cursor: pointer;
+}
+input[type="range"] { width: 100%; accent-color: var(--color-primary); }
+
+.check-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 0;
+}
+.check-inline input { width: 16px; height: 16px; accent-color: var(--color-primary); }
+
+/* Mehrfachauswahl der Authenticator-Apps: 2-spaltiges Checkbox-Raster */
+.auth-options { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; }
+.auth-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.auth-options input { width: 16px; height: 16px; accent-color: var(--color-primary); flex: none; }
+
+.form-error {
+  color: var(--color-danger);
+  font-size: 13px;
+  margin: 4px 0 0;
+  padding: 8px 10px;
+  background: var(--color-error-bg);
+  border-radius: var(--radius-sm);
+}
+
+/* Passwortfeld mit Auge (Klartext umschalten). Das Feld fällt bei jedem Sperren,
+   Entsperren und Schließen des Dialogs auf „verborgen" zurück (app.js). */
+.field > .pw-field { font-size: inherit; color: inherit; font-weight: inherit; }
+.pw-field { position: relative; display: block; }
+.pw-field > input { padding-right: 42px; }
+.pw-toggle {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 17px;
+  cursor: pointer;
+}
+.pw-toggle:hover { background: var(--color-hover); color: var(--color-text); }
+.pw-toggle:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+.pw-toggle[aria-pressed="true"] { color: var(--color-primary); }
+/* Edge blendet sonst ein eigenes Auge ein → doppelt */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear { display: none; }
+
+/* ----------------------------------------------------------------
+   5. Lock Screen
+   ---------------------------------------------------------------- */
+/* Karte beginnt bei 10 % der Bildschirmhöhe (nicht zentriert). Hohe Inhalte
+   (Setup + Kacheln, schmale Fenster) scrollen statt abzuschneiden. */
+.lock-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  overflow-y: auto;
+  background: linear-gradient(135deg, var(--lock-grad-1) 0%, var(--lock-grad-2) 100%);
+  padding: 10vh 20px 20px;
+  z-index: 100;
+}
+.lock-card {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 8px 28px 24px;
+  text-align: left;
+}
+
+/* Kartenkopf: Marke links, Generator + Anleitung rechts */
+.lock-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+}
+.lock-brand { display: flex; align-items: baseline; gap: 10px; }
+.lock-logo { font-size: 28px; line-height: 1; align-self: center; }
+.lock-title { font-size: 22px; }
+/* Dezente Versionsnummer neben dem Lock-Screen-Titel */
+.lock-version { font-size: 11px; font-weight: 500; color: var(--color-text-muted); }
+.lock-head-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.lock-head-btn { color: var(--color-text-muted); }
+.lock-head-btn:hover { color: var(--color-text); }
+
+/* Sektionen (Entsperren · Speicherort · Notfall), per Trennlinie abgesetzt */
+.lock-section {
+  border-top: 1px solid var(--color-border);
+  padding-top: 18px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.lock-section + .lock-section { margin-top: 20px; }
+.lock-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+.lock-subtitle,
+.lock-section-hint { color: var(--color-text-muted); font-size: 14px; margin: 0; }
+
+.lock-form { display: flex; flex-direction: column; gap: 12px; }
+.lock-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+/* Unlock: Passwortfeld + Button in einer Zeile */
+.lock-row { display: flex; align-items: flex-end; gap: 10px; }
+.lock-actions { display: flex; justify-content: flex-end; }
+.lock-submit { min-width: 180px; padding-top: 10px; padding-bottom: 10px; }
+
+.lock-warning {
+  font-size: 12px;
+  color: var(--color-warn-text);
+  background: var(--color-warn-bg);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  margin: 0;
+}
+.lock-info {
+  font-size: 13px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  margin: 0;
+}
+
+/* Status der Tresor-Datei-Verknüpfung (Hilfstext unter „Speicherort") */
+.lock-file-status { margin: 0; font-size: 14px; color: var(--color-text-muted); }
+/* Unbrauchbare Verknüpfung (z. B. nach Browser-Neuinstallation) deutlich zeigen */
+.lock-file-status.is-warn {
+  font-size: 13px;
+  color: var(--color-warn-text);
+  background: var(--color-warn-bg);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+
+/* Kacheln: Icon + Titel + Hilfstext. Als <button> klickbar, als <div> reine Statusanzeige. */
+.lock-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.lock-tile {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 14px;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+button.lock-tile { cursor: pointer; }
+button.lock-tile:hover {
+  background: var(--color-hover);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+button.lock-tile:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.lock-tile-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-size: 20px;
+}
+.lock-tile-icon .icon { stroke-width: 1.8; }
+.lock-tile-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.lock-tile-title { font-weight: 600; line-height: 1.3; }
+.lock-tile-hint { font-size: 13px; color: var(--color-text-muted); line-height: 1.4; }
+.lock-file-name { color: var(--color-text); font-weight: 500; overflow-wrap: anywhere; }
+.lock-tile-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; }
+.lock-tile-actions .btn-link { padding: 4px 0; }
+
+/* „✓ aktiv"-Markierung nur an der aktiven Statuskachel */
+.lock-tile-badge {
+  display: none;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: var(--radius-lg);
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+.lock-tile.is-status:not(.is-active) { opacity: 0.6; }
+.lock-tile.is-active {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+}
+.lock-tile.is-active .lock-tile-badge { display: inline-block; }
+
+/* Gefährliche Aktion (Tresor zurücksetzen) */
+.lock-tile.is-danger .lock-tile-icon { color: var(--color-danger); }
+button.lock-tile.is-danger:hover {
+  background: var(--color-error-bg);
+  border-color: var(--color-danger);
+}
+
+@media (max-width: 640px) {
+  .lock-screen { padding: 10vh 12px 12px; }
+  .lock-card { padding: 4px 16px 18px; }
+  .lock-grid-2 { grid-template-columns: 1fr; }
+  .lock-row { flex-direction: column; align-items: stretch; }
+  .lock-submit { width: 100%; }
+  .lock-tiles { grid-template-columns: 1fr; }
+}
+
+/* ----------------------------------------------------------------
+   6. App-Layout & Header
+   ---------------------------------------------------------------- */
+.app { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* Header + Filterleiste als eine Einheit oben fixieren.
+   padding-bottom = sauberer Abstand zum Spaltenkopf/Info-Card; die solide
+   Hintergrundfarbe deckt durchlaufende Listenzeilen in dieser Lücke ab. */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--color-bg);
+  padding-bottom: 24px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
+.header-brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; }
+.brand-logo { font-size: 22px; }
+/* Dezente Versionsnummer als kleiner Hochindex direkt am Titel */
+.brand-version {
+  align-self: center;
+  margin-left: -3px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+  transform: translateY(-3px);
+}
+/* Tresor-Datum mit etwas Abstand neben dem Titel */
+.vault-date {
+  margin-left: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+/* Verknüpfte Tresor-Datei: Button „Tresor lösen" (öffnet Info-Modal) */
+.vault-file { margin-left: 8px; }
+.unlink-info {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 14px;
+  margin: 0 0 14px;
+}
+.unlink-info dt { color: var(--color-text-muted); }
+.unlink-info dd { margin: 0; font-weight: 500; overflow-wrap: anywhere; }
+.unlink-explain { margin: 0; }
+/* Fail-loud: bleibt sichtbar, bis wieder erfolgreich gespeichert wurde */
+.vault-unsaved {
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--color-warn-text);
+  background: var(--color-warn-bg);
+  border-radius: var(--radius-sm);
+}
+.header-brand #btn-lock { margin-left: 8px; }
+/* Countdown bis zur Auto-Sperre (rechts neben Hell/Dunkel) */
+.idle-timer {
+  display: inline-flex;
+  align-items: center;
+  align-self: stretch;
+  gap: 6px;
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums; /* Ziffern springen nicht in der Breite */
+  white-space: nowrap;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: default;
+}
+/* Letzte 30 Sekunden: deutlicher Warnhinweis */
+.idle-timer.warn {
+  color: var(--color-warn-text);
+  background: var(--color-warn-bg);
+  border-color: var(--color-warn-text);
+}
+/* Suchfeld: neben der Marke, höchstens 300px breit */
+.header-search { flex: 1 1 180px; min-width: 180px; max-width: 300px; }
+/* Buttons: eigene Zeile unter Logo/Titel, linksbündig */
+.header-actions {
+  flex: 0 0 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Suchfeld mit Lupe (links, klickbar) und Leeren-x (rechts) */
+.search-box { position: relative; display: flex; align-items: center; }
+.search-box input {
+  width: 100%;
+  padding-left: 38px;
+  padding-right: 34px;
+}
+.search-btn {
+  position: absolute;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+}
+.search-btn-go { left: 5px; font-size: 16px; }
+.search-btn-go:hover { color: var(--color-primary); }
+.search-btn-clear { right: 5px; font-size: 16px; }
+.search-btn-clear:hover { color: var(--color-text); }
+
+/* ----------------------------------------------------------------
+   7. Filterleiste
+   ---------------------------------------------------------------- */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 24px;
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+}
+.filter-bar .field-inline { flex: 0 0 auto; }
+
+/* ----------------------------------------------------------------
+   8. Inhalt: Karten-Grid
+   ---------------------------------------------------------------- */
+/* Zwei-Spalten-Layout: links Liste, rechts Info-Card */
+.content {
+  flex: 1;
+  /* Kein padding-top: Der obere Abstand kommt aus der Topbar (padding-bottom),
+     damit er gescrollt wie ungescrollt identisch ist und nichts „springt". */
+  padding: 0 24px 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.list-pane { min-width: 0; }
+.detail-pane { position: sticky; top: var(--topbar-h, 88px); }
+
+/* ---- Linke Liste (gruppiert, auf-/zuklappbar) ---- */
+.table-wrap {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  /* Obere Kante + Rundung übernimmt der (sticky) Tabellenkopf selbst — sonst
+     gäbe es im fixierten Zustand eine doppelte Linie. Daher hier oben randlos
+     und nur unten gerundet. Kein overflow:hidden (würde sticky brechen). */
+  border-top: none;
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
+}
+.entry-table {
+  width: 100%;
+  /* fixed: Spaltenbreiten kommen aus den %-Vorgaben am thead, NICHT aus dem
+     Zelleninhalt. So füllt die Tabelle immer exakt ihre Grid-Spalte und läuft
+     nicht nach rechts in die Info-Card über; lange Werte werden via
+     text-overflow:ellipsis (s. td) abgeschnitten. */
+  table-layout: fixed;
+  /* separate (statt collapse), damit der sticky Tabellenkopf seinen
+     Hintergrund zuverlässig deckend über durchscrollende (farbige) Zeilen
+     malt. Es sind nur border-bottom/-right gesetzt → keine Doppelrahmen. */
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+}
+/* Spaltenbreiten (Summe 100 %): Dienst · Username · E-Mail · Passwort */
+.entry-table thead th:nth-child(1) { width: 33%; }
+.entry-table thead th:nth-child(2) { width: 22%; }
+.entry-table thead th:nth-child(3) { width: 27%; }
+.entry-table thead th:nth-child(4) { width: 18%; }
+.entry-table thead th {
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text);
+  background: var(--color-surface-2);
+  padding: 8px 14px;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: sticky;
+  top: var(--topbar-h, 88px);
+  z-index: 5;
+}
+.entry-table tbody td {
+  padding: 5px 14px;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+  color: var(--color-text-muted);
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Vertikale gestrichelte Trennlinien zwischen den Spalten */
+.entry-table thead th,
+.entry-table tbody td {
+  border-right: 1px dashed var(--color-dash);
+}
+.entry-table thead th:last-child,
+.entry-table tbody td:last-child {
+  border-right: none;
+}
+.cell-service { font-weight: 600; color: var(--color-text); }
+.cell-service-inner { display: inline-flex; align-items: center; gap: 5px; }
+.entry-badge { font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 3px; letter-spacing: 0.02em; white-space: nowrap; line-height: 1.5; }
+.badge-2fa    { background: #e8f5ee; color: #3a7a5a; }
+.badge-auth   { background: #f0ecfa; color: #7b5db0; }
+.badge-google { background: #e8f0fb; color: #4a6ea8; }
+.badge-abo    { background: #fdf5e0; color: #8a6530; }
+.badge-pay    { background: #dcdcdc; color: #000; display: inline-block; text-align: center; }
+[data-theme="dark"] .badge-pay { background: #8a8f8c; color: #000; }
+[data-theme="dark"] .badge-2fa    { background: #1e3a2e; color: #7ebf9a; }
+[data-theme="dark"] .badge-auth   { background: #2a1f45; color: #a08ed0; }
+[data-theme="dark"] .badge-google { background: #1a2e48; color: #7aa0c8; }
+[data-theme="dark"] .badge-abo    { background: #3a2808; color: #c8a055; }
+/* Link-Icon im Stil des Kopier-Buttons (gerahmtes Kästchen, dezent, Hover) */
+.service-link-icon {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  flex: 0 0 auto;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  opacity: 0.45;
+  transition: opacity 0.12s, background 0.12s, color 0.12s;
+}
+.entry-row:hover .service-link-icon { opacity: 1; }
+.service-link-icon:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+  opacity: 1;
+}
+.cell-pw { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
+.cell-empty { color: var(--color-empty); }
+
+/* Gruppen-Kopfzeile */
+.group-header-row td.group-header-cell { padding: 0; max-width: none; display: flex; align-items: center; }
+.group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: left;
+}
+.group-pdf-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  padding: 6px 10px;
+  font-size: 18px;
+  font-family: inherit;
+  line-height: 1;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  opacity: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
+}
+.group-header-row:hover .group-pdf-btn { opacity: 1; }
+.group-pdf-btn:hover,
+.group-pdf-btn:focus {
+  background: var(--color-surface-2);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  opacity: 1;
+}
+.group-caret { font-size: 16px; color: var(--color-text-muted); width: 16px; display: inline-flex; align-items: center; justify-content: center; }
+.group-dot { width: 11px; height: 11px; border-radius: 50%; flex: 0 0 auto; }
+.group-name { flex: 1; }
+.group-count {
+  flex: 0 0 auto;
+  margin-right: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: var(--color-count-bg);
+  border-radius: 999px;
+  padding: 1px 9px;
+}
+
+/* Eintragszeilen */
+.entry-table tbody tr.entry-row { cursor: pointer; }
+.entry-table tbody tr.entry-row:hover { background: var(--color-surface-2); }
+.entry-table tbody tr.entry-row.selected { background: var(--color-primary-soft); }
+.entry-table tbody tr.entry-row td:first-child { padding-left: 30px; }
+
+/* Zellen mit Kopier-Button (Username / E-Mail / Passwort) */
+.copy-wrap { display: flex; align-items: center; gap: 6px; }
+.cell-val { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
+.icon-btn.row-copy {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  flex: 0 0 auto;
+  opacity: 0.45;
+  transition: opacity 0.12s;
+}
+.entry-row:hover .row-copy,
+.row-copy:focus-visible,
+.row-copy.copied { opacity: 1; }
+.icon-btn.copied { color: var(--color-success); }
+
+
+
+/* Header-Icon-Button (Theme-Umschalter) */
+.btn-icon { padding: 9px 11px; font-size: 20px; line-height: 1; }
+.btn-icon.active { background: var(--color-primary-soft); color: var(--color-primary); border-color: var(--color-primary); }
+
+.group-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.group-badge.no-group { background: #9ca3af; }
+
+/* ---- Rechte Info-Card ---- */
+.info-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+  max-height: calc(100vh - var(--topbar-h, 88px) - 24px);
+  overflow-y: auto;
+}
+.info-empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: 48px 16px;
+}
+.info-empty-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+.info-empty p { margin: 0; }
+
+.info-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+.info-head-main { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 0; }
+.info-title { font-size: 19px; word-break: break-word; }
+.info-head-actions { display: flex; gap: 6px; flex: 0 0 auto; }
+.info-head-actions .icon-btn {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+/* Kräftigere Strichstärke = optisch „fett" für die drei Aktions-Icons */
+.info-head-actions .icon-btn .icon { stroke-width: 2.4; }
+
+/* ---- Info-Card: gemeinsame Feld-Bausteine ---- */
+.info-section { margin-bottom: 14px; }
+.info-section:last-child { margin-bottom: 0; }
+.info-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-primary);
+}
+.info-item { font-size: 14px; }
+.info-label { color: var(--color-text-muted); }
+.info-val-wrap { display: flex; align-items: flex-start; gap: 6px; min-width: 0; }
+.info-value { color: var(--color-text); font-weight: 500; word-break: break-word; min-width: 0; flex: 1; }
+/* Mehrzeilige Felder (Notizen, Sicherheitsfragen): Zeilenumbrüche erhalten */
+.info-value.pre { white-space: pre-wrap; font-weight: 400; }
+.icon-btn.info-copy {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  flex: 0 0 auto;
+}
+.info-link { color: var(--color-primary); word-break: break-all; text-underline-offset: 2px; }
+
+/* Sektionen als Boxen mit getöntem Titel-Balken */
+.layout-bar .info-section {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.layout-bar .info-section-title {
+  background: var(--color-primary-soft);
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+.layout-bar .info-fields { padding: 4px 14px 8px; }
+.layout-bar .info-item {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--color-dash);
+}
+.layout-bar .info-item:last-child { border-bottom: none; }
+
+.empty-state { text-align: center; padding: 64px 20px; color: var(--color-text-muted); }
+.empty-title { font-size: 18px; font-weight: 600; color: var(--color-text); margin: 0 0 4px; }
+.empty-hint { margin: 0; }
+
+/* ----------------------------------------------------------------
+   9. Modals
+   ---------------------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 24, 40, 0.45);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  overflow-y: auto;
+  /* Über dem Lock-Screen (z-index 100), damit Dialoge auch auf dem
+     Sperrbildschirm sichtbar sind (z. B. Backup-Passwort, Reset-Bestätigung) */
+  z-index: 150;
+}
+#restore-pw-modal { background: rgba(0, 0, 0, 0.75); }
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  animation: modal-in 0.18s ease;
+}
+.modal-sm { max-width: 400px; }
+.modal-lg { max-width: 720px; }
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--color-border);
+}
+.modal-header h2 { font-size: 18px; }
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0 4px;
+}
+.modal-close:hover { color: var(--color-text); }
+
+.modal-body { padding: 22px; display: flex; flex-direction: column; gap: 16px; }
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Formularaufbau in Modals */
+.form-section {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin: 0;
+  background: var(--color-surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.form-section legend { font-size: 16px; font-weight: 700; color: var(--color-primary); padding: 0 6px; }
+.form-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
+.form-row-mixed { align-items: center; }
+.check-inline-top { align-self: flex-end; padding-bottom: 8px; }
+.input-with-btn { display: flex; gap: 8px; align-items: stretch; }
+.input-with-btn input { flex: 1; }
+
+/* ----------------------------------------------------------------
+   10. Passwortgenerator
+   ---------------------------------------------------------------- */
+.gen-tabs { display: flex; margin-bottom: 14px; border-bottom: 2px solid var(--border); }
+.gen-tab { flex: 1; padding: 7px; background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 14px; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: color .15s, border-color .15s; }
+.gen-tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.gen-tab:hover:not(.active) { color: var(--text); }
+.gen-options { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
+.gen-output { display: flex; gap: 8px; margin-top: 12px; }
+.gen-output input {
+  flex: 1;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 15px;
+}
+
+/* ----------------------------------------------------------------
+   11. Gruppenverwaltung
+   ---------------------------------------------------------------- */
+.group-form { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+.group-form .field-grow { flex: 0 1 auto; width: calc(100% - 180px); }
+.group-form-actions { display: flex; gap: 6px; }
+.color-presets {
+  flex: 0 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.color-preset {
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+  padding: 0;
+  flex: 0 0 auto;
+}
+.color-preset:hover { transform: scale(1.2); border-color: var(--color-text); }
+.color-preset.selected { border-color: var(--color-text); outline: 2px solid var(--color-surface); outline-offset: -3px; }
+.color-preset-sep { width: 10px; flex: 0 0 auto; }
+
+.print-select-actions { display: flex; gap: 8px; margin-bottom: 10px; }
+.print-group-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.print-group-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  cursor: pointer;
+}
+.print-summary { margin: 12px 0 0; color: var(--color-text-muted); }
+
+.group-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.group-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+}
+.group-swatch { width: 18px; height: 18px; border-radius: 5px; flex: 0 0 auto; }
+.group-list-name { flex: 1; font-weight: 500; }
+.group-list-count { font-size: 16px; color: var(--color-text-muted); }
+.group-list-actions { display: flex; gap: 4px; }
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+}
+.icon-btn:hover { background: var(--color-hover); color: var(--color-text); }
+.icon-btn.danger:hover { background: var(--color-error-bg); color: var(--color-danger); }
+
+.import-summary {
+  background: var(--color-primary-soft);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Export-Auswahl (verschlüsselt / Klartext) */
+.export-choice { display: flex; flex-direction: column; gap: 12px; }
+.export-option {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s;
+}
+.export-option:hover { border-color: var(--color-primary); background: var(--color-surface-2); }
+.export-option-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.export-option-desc { font-size: 13px; color: var(--color-text-muted); }
+.export-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-primary);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+/* ----------------------------------------------------------------
+   12. Toasts
+   ---------------------------------------------------------------- */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 200;
+  align-items: center;
+}
+.toast {
+  background: var(--toast-bg);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-size: 14px;
+  animation: toast-in 0.2s ease;
+}
+.toast.success { background: var(--color-success); }
+.toast.error { background: var(--color-danger); }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ----------------------------------------------------------------
+   13. Responsive (Desktop-Fokus, aber bricht sauber um)
+   ---------------------------------------------------------------- */
+/* Mittelgroße Screens: Liste + Card untereinander statt nebeneinander */
+@media (max-width: 1024px) {
+  .content { grid-template-columns: 1fr; }
+  .detail-pane { position: static; top: auto; }
+  .info-card { max-height: none; }
+}
+
+@media (max-width: 720px) {
+  .header { flex-direction: column; align-items: stretch; }
+  .header-search { max-width: none; flex-basis: auto; }
+  .header-actions { justify-content: space-between; }
+  .form-row { flex-direction: column; align-items: stretch; }
+
+  /* Tabelle horizontal scrollbar statt abgeschnitten */
+  .table-wrap { overflow-x: auto; }
+  .entry-table { min-width: 560px; }
+  .info-item { grid-template-columns: 110px 1fr auto; }
+}
+
+/* ----------------------------------------------------------------
+   14. Druck / PDF
+   Der Druckcontainer ist normal versteckt und nur beim Drucken sichtbar.
+   Beim Drucken wird die gesamte App ausgeblendet.
+   ---------------------------------------------------------------- */
+.print-area { display: none; }
+
+@media print {
+  body { background: #fff; }
+  /* Alles außer dem Druckbereich ausblenden */
+  .app, .modal-overlay, .lock-screen, .toast-container { display: none !important; }
+
+  .print-area {
+    display: block !important;
+    color: #000;
+    font-size: 12px;
+  }
+
+  .print-doc-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 4px;
+  }
+  .print-doc-sub { color: #555; font-size: 11px; margin: 0 0 16px; }
+
+  /* Gruppen-Überschrift über jeder Tabelle */
+  .print-group-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 16px 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .print-group-title:first-of-type { margin-top: 0; }
+  .print-group-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Tabellenansicht: eine Zeile pro Eintrag */
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 10px;
+    margin-bottom: 8px;
+  }
+  .print-table th,
+  .print-table td {
+    border: 1px solid #ccc;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  .print-table th {
+    background: #f0f0f0;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .print-table tr { page-break-inside: avoid; }
+  .print-td-name { font-weight: 600; }
+  /* Spaltenbreiten: Dienst | Username | E-Mail | Passwort | Notizen/Sicherheit */
+  .print-table th:nth-child(1), .print-table td:nth-child(1) { width: 16%; }
+  .print-table th:nth-child(2), .print-table td:nth-child(2) { width: 15%; }
+  .print-table th:nth-child(3), .print-table td:nth-child(3) { width: 19%; }
+  .print-table th:nth-child(4), .print-table td:nth-child(4) { width: 17%; }
+  .print-table th:nth-child(5), .print-table td:nth-child(5) { width: 33%; }
+
+  /* Notizen + Sicherheits-Block in der letzten Spalte */
+  .print-notes { white-space: normal; }
+  .print-sec {
+    margin-top: 4px;
+    padding-top: 3px;
+    border-top: 1px dotted #bbb;
+    color: #333;
+  }
+  .print-notes + .print-sec { margin-top: 4px; }
+}
